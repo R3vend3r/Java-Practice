@@ -2,7 +2,7 @@ public class Room {
     private int numberRoom;
     private static int roomCount = 0;
     private boolean isEmpty;
-    private StatusRoom status;
+    private RoomCondition roomCondition;
     private double priceForDay;
     private String clientID;
 
@@ -12,7 +12,7 @@ public class Room {
         }
         this.numberRoom = ++roomCount;
         isEmpty = true;
-        status = StatusRoom.READY;
+        roomCondition = RoomCondition.READY;
         this.priceForDay = priceForDay;
     }
 
@@ -24,11 +24,11 @@ public class Room {
     public void clearRoom(){
         isEmpty = true;
         clientID = null;
-        status = StatusRoom.CLEANING_REQUIRED;
+        roomCondition = RoomCondition.CLEANING_REQUIRED;
     }
 
     public void completeCleaningRoom(){
-        status = StatusRoom.READY;
+        roomCondition = RoomCondition.READY;
     }
 
     public int getNumberRoom() {
@@ -36,7 +36,7 @@ public class Room {
     }
 
     public void needRepair(){
-        status = StatusRoom.ON_REPAIR;
+        roomCondition = RoomCondition.ON_REPAIR;
         isEmpty = false;
         clientID = null;
     }
@@ -60,16 +60,16 @@ public class Room {
         this.priceForDay = priceForDay;
     }
 
-    public StatusRoom getStatus() {
-        return status;
+    public RoomCondition getRoomCondition() {
+        return roomCondition;
     }
 
-    public String getClientID() {
+    public String getClientId() {
         return clientID;
     }
 
-    public void setStatus(StatusRoom status) {
-        this.status = status;
+    public void setRoomCondition(RoomCondition status) {
+        this.roomCondition = status;
     }
 
     @Override
@@ -77,7 +77,7 @@ public class Room {
         return "Room{" +
                 "numberRoom=" + numberRoom +
                 ", isEmpty=" + isEmpty +
-                ", status=" + status +
+                ", status=" + roomCondition +
                 ", priceForDay=" + priceForDay +
                 ", clientID='" + clientID + '\'' +
                 '}';

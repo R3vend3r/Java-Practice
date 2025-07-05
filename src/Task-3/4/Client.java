@@ -3,7 +3,7 @@ import java.util.UUID;
 public class Client {
     private String name;
     private String surname;
-    private  String id;
+    private final String id;
     private Room roomLive;
 
     public Client(String surname, String name) {

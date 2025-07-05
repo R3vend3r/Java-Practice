@@ -27,7 +27,7 @@ public class MainTest {
         hotel.changePriceRoom(room1, 600.0);
         hotel.changePriceService(service1, 60.0);
 
-        hotel.changeStatusRoom(room3, StatusRoom.ON_REPAIR);
+        hotel.changeStatusRoom(room3, RoomCondition.ON_REPAIR);
         System.out.println();
 
         System.out.println("Пробуем заселить в комнату на ремонте:");
@@ -48,7 +48,7 @@ public class MainTest {
         System.out.println();
 
         System.out.println("Список комнат:");
-        List<Room> rooms = hotel.getRooms();
+        List<Room> rooms = hotel.getRoomsList();
         for (Room room : rooms) {
             System.out.println(room);
         }
