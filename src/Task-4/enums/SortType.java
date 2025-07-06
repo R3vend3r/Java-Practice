@@ -1,0 +1,10 @@
+package enums;
+
+public enum SortType {
+    CAPACITY,
+    PRICE,
+    ALPHABET,
+    DATE_END,
+    NONE,
+    STARS;
+}
