@@ -1,6 +1,5 @@
 package model;
 
-import enums.RoomCondition;
 
 import java.util.ArrayList;
 import java.util.List;

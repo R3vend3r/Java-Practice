@@ -5,7 +5,6 @@ public class Client {
     private String name;
     private String surname;
     private final String id;
-    private Room roomLive;
 
     public Client(String surname, String name) {
         this.surname = surname;
@@ -35,14 +34,6 @@ public class Client {
 
     public String getClientId() {
         return id;
-    }
-
-    public void setRoomLive(Room room) {
-        this.roomLive = room;
-    }
-
-    public Room getRoomLive() {
-        return roomLive;
     }
 
 }
