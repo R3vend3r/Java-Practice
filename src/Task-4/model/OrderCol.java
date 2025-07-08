@@ -20,7 +20,6 @@ public class OrderCol {
         amenityOrders = new ArrayList<>();
     }
 
-    // Основные операции (оставлены как у вас)
     public void checkIn(Client client, Room room, Date checkInDate, Date checkOutDate) {
         Order order = new Order(client, room, checkInDate, checkOutDate, room.getPriceForDay());
         activeOrders.add(order);
@@ -73,7 +72,6 @@ public class OrderCol {
         };
     }
 
-        // Специальные методы (оставлены как у вас)
     public List<Order> getLastThreeClientsForRoom(int roomNumber) {
         return completedOrders.stream()
                 .filter(o -> o.getRoom() != null && o.getRoom().getNumberRoom() == roomNumber)

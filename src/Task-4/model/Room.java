@@ -6,7 +6,7 @@ import java.util.Date;
 public class Room {
     private int numberRoom;
     private static int roomCount = 0;
-    private boolean isEmpty;
+    private boolean isAvailable;
     private RoomCondition roomCondition;
 
     private double priceForDay;
@@ -20,7 +20,7 @@ public class Room {
         }
         this.numberRoom = numberRoom;
         ++roomCount;
-        isEmpty = true;
+        isAvailable = true;
         roomCondition = RoomCondition.READY;
         this.priceForDay = priceForDay;
     }
@@ -28,7 +28,7 @@ public class Room {
 
 
     public void clearRoom(){
-        isEmpty = true;
+        isAvailable = true;
         roomCondition = RoomCondition.CLEANING_REQUIRED;
     }
 
@@ -38,7 +38,7 @@ public class Room {
 
     public void needRepair(){
         roomCondition = RoomCondition.ON_REPAIR;
-        isEmpty = false;
+        isAvailable = false;
     }
 
     public void setNumberRoom(int numberRoom) {
@@ -46,11 +46,11 @@ public class Room {
     }
 
     public boolean getEmpty() {
-        return isEmpty;
+        return isAvailable;
     }
 
     public void changeAvailable(){
-        this.isEmpty = !isEmpty;
+        this.isAvailable = !isAvailable;
     }
 
 
@@ -99,7 +99,7 @@ public class Room {
     public String toString() {
         return "model.Room{" +
                 "numberRoom=" + numberRoom +
-                ", isEmpty=" + isEmpty +
+                ", isAvailable=" + isAvailable +
                 ", status=" + roomCondition +
                 ", priceForDay=" + priceForDay +
                 '}';

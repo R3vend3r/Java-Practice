@@ -3,18 +3,20 @@ package model;
 import java.util.Date;
 
 public class Order {
-    private int orderId;
+    private int getId;
+    private static int id = 0;
     private Room room;
     private Client client;
     private Amenity service;
     private double price;
-    private  Date dateIn;
+    private  Date startDate;
     private  Date endDate;
 
-    public Order(Client client, Room room, Date dateIn, Date dateOut, double price) {
+    public Order(Client client, Room room, Date startDate, Date dateOut, double price) {
+        this.getId = id++;
         this.room = room;
         this.price = price;
-        this.dateIn = dateIn;
+        this.startDate = startDate;
         this.endDate = dateOut;
         this.client = client;
     }

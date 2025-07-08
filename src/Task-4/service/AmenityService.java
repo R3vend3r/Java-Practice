@@ -37,6 +37,6 @@ public class AmenityService {
     }
 
     public List<Amenity> getAmenitiesSortedByName() {
-        return amenityCol.getSortedAmenities(Comparator.comparing(Amenity::getNameService));
+        return amenityCol.getSortedAmenities(Comparator.comparing(Amenity::getName));
     }
 }

@@ -56,7 +56,7 @@ public class MainTest {
         hotel.addClientAmenity(client1, cleaning, checkOut1);
 
         hotel.getClientAmenities(client2, SortType.PRICE).forEach(o ->
-                System.out.println(o.getService().getNameService() + ": " + o.getService().getPrice()));
+                System.out.println(o.getService().getName() + ": " + o.getService().getPrice()));
 
         // Тестирование сортировок
         System.out.println("\n=== Тестирование сортировок ===");
@@ -81,7 +81,7 @@ public class MainTest {
         System.out.println("\n2. Услуги клиента " + client1.getName() + " по цене:");
 
         hotel.getClientAmenities(client1, SortType.PRICE).forEach(o ->
-                System.out.println("- " + o.getService().getNameService() + ": " + o.getService().getPrice() + " руб."));
+                System.out.println("- " + o.getService().getName() + ": " + o.getService().getPrice() + " руб."));
 
         System.out.println("\n3. Детали номера 102:");
         System.out.println(hotel.getRoomDetails(102));
