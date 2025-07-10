@@ -1,7 +1,5 @@
 package model;
 
-import enums.RoomType;
-import interfaceClass.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,6 +26,10 @@ public class RoomBooking extends Order {
     public void addService(AmenityOrder service) {
         services.add(service);
         setTotalPrice(getTotalPrice() + service.getAmenity().getPrice());
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
     }
 
     public void setCheckOutDate(Date checkOutDate) {

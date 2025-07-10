@@ -2,15 +2,11 @@ package service;
 
 import enums.SortType;
 import interfaceClass.IOrderRepository;
-import interfaceClass.*;
 import model.*;
-
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class OrderService {
     private final IOrderRepository orderRepository;
@@ -24,13 +20,12 @@ public class OrderService {
          orderRepository.createRoomBooking(client, room, checkInDate, checkOutDate);
     }
 
-    public AmenityOrder addAmenityToBooking(int roomNumber, Amenity amenity, Date serviceDate) {
+    public void addAmenityToBooking(int roomNumber, Amenity amenity, Date serviceDate) {
         RoomBooking booking = orderRepository.findActiveBookingByRoom(roomNumber)
                 .orElseThrow(() -> new IllegalArgumentException("No active booking for room " + roomNumber));
 
         AmenityOrder order = orderRepository.addAmenityOrder(booking.getClient(), amenity, serviceDate);
         booking.addService(order);
-        return order;
     }
 
     public void completeRoomBooking(int roomNumber, Date checkOutDate) {

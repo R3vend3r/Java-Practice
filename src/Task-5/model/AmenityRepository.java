@@ -4,7 +4,6 @@ package model;
 import interfaceClass.*;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 public class AmenityRepository implements IAmenityRepository {
     private final List<Amenity> amenities;
@@ -14,7 +13,7 @@ public class AmenityRepository implements IAmenityRepository {
     }
 
     @Override
-    public void addAmenity(Amenity amenity) {
+    public void addAmenity(Amenity amenity) throws IllegalArgumentException {
         Objects.requireNonNull(amenity, "Amenity cannot be null");
 
         if (containsAmenity(amenity.getName())) {
@@ -32,9 +31,8 @@ public class AmenityRepository implements IAmenityRepository {
     }
 
     @Override
-    public void updateAmenityPrice(String amenityName, double newPrice) {
+    public void updateAmenityPrice(String amenityName, double newPrice) throws IllegalArgumentException {
         Objects.requireNonNull(amenityName, "Amenity name cannot be null");
-
         findAmenityByName(amenityName)
                 .ifPresentOrElse(
                         amenity -> amenity.setPrice(newPrice),

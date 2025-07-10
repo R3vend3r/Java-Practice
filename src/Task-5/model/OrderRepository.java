@@ -61,7 +61,7 @@ public class OrderRepository implements IOrderRepository {
     }
 
     @Override
-    public void completeRoomBooking(int roomNumber, Date checkOutDate) {
+    public void completeRoomBooking(int roomNumber, Date checkOutDate) throws IllegalArgumentException {
         Objects.requireNonNull(checkOutDate, "CheckOut date cannot be null");
 
         RoomBooking booking = activeBookings.stream()
@@ -111,7 +111,7 @@ public class OrderRepository implements IOrderRepository {
     }
 
     @Override
-    public List<RoomBooking> getSortedBookings(SortType sortType) {
+    public List<RoomBooking> getSortedBookings(SortType sortType) throws IllegalArgumentException{
         Objects.requireNonNull(sortType, "Sort type cannot be null");
 
         Comparator<Order> comparator = switch (sortType) {
@@ -127,7 +127,7 @@ public class OrderRepository implements IOrderRepository {
     }
 
     @Override
-    public List<AmenityOrder> getSortedAmenityOrders(SortType sortType) {
+    public List<AmenityOrder> getSortedAmenityOrders(SortType sortType) throws IllegalArgumentException{
         Objects.requireNonNull(sortType, "Sort type cannot be null");
 
         Comparator<AmenityOrder> comparator = switch (sortType) {

@@ -53,14 +53,6 @@ public class RoomService {
         return Optional.ofNullable(roomRepository.getAssignedClientId(roomNumber));
     }
 
-    public Map<Integer, Room> getAllRooms() {
-        return roomRepository.getAllRooms();
-    }
-
-    public Map<Integer, Room> getAvailableRooms() {
-        return roomRepository.getAvailableRooms();
-    }
-
     public Map<Integer, Room> getRoomsByCondition(RoomCondition condition) {
         Objects.requireNonNull(condition, "Condition cannot be null");
         return roomRepository.getRoomsByCondition(condition);

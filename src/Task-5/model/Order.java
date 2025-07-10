@@ -1,6 +1,5 @@
 package model;
 
-import interfaceClass.*;
 import java.util.Date;
 
 public abstract class Order{

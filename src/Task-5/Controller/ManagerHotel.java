@@ -8,8 +8,9 @@ import java.util.stream.Collectors;
 
 import model.*;
 import service.*;
+
 public class ManagerHotel {
-    private String nameHotel;
+//    private String nameHotel;
     private final RoomService roomService;
     private final AmenityService amenityService;
     private final ClientService clientService;
@@ -27,19 +28,19 @@ public class ManagerHotel {
         this.orderService = new OrderService(orderRepository);
     }
 
-    public ManagerHotel(String nameHotel) {
-        this.nameHotel = Objects.requireNonNull(nameHotel, "Hotel name cannot be null");
-
-        IRoomRepository roomRepository = new RoomRepository();
-        IAmenityRepository amenityRepository = new AmenityRepository();
-        IClientRepository clientRepository = new ClientRepository();
-        IOrderRepository orderRepository = new OrderRepository();
-
-        this.roomService = new RoomService(roomRepository);
-        this.amenityService = new AmenityService(amenityRepository);
-        this.clientService = new ClientService(clientRepository);
-        this.orderService = new OrderService(orderRepository);
-    }
+//    public ManagerHotel(String nameHotel) {
+//        this.nameHotel = Objects.requireNonNull(nameHotel, "Hotel name cannot be null");
+//
+//        IRoomRepository roomRepository = new RoomRepository();
+//        IAmenityRepository amenityRepository = new AmenityRepository();
+//        IClientRepository clientRepository = new ClientRepository();
+//        IOrderRepository orderRepository = new OrderRepository();
+//
+//        this.roomService = new RoomService(roomRepository);
+//        this.amenityService = new AmenityService(amenityRepository);
+//        this.clientService = new ClientService(clientRepository);
+//        this.orderService = new OrderService(orderRepository);
+//    }
 
     public void settleClient(Client client, Room room, Date checkOutDate) {
         Objects.requireNonNull(client, "Client cannot be null");
@@ -51,8 +52,6 @@ public class ManagerHotel {
                 .orElse(false)) {
             throw new IllegalStateException("Room " + room.getNumberRoom() + " is not available");
         }
-
-
         orderService.createRoomBooking(client, room, new Date(), checkOutDate);
         roomService.assignClientToRoom(room.getNumberRoom(), client.getClientId(), checkOutDate);
         roomService.markRoomOccupied(room);
@@ -79,10 +78,6 @@ public class ManagerHotel {
 
     public Optional<Amenity> findAmenityByName(String name) {
         return amenityService.findAmenityByName(name);
-    }
-
-    public double calculatingTotalIncome(){
-        return orderService.calculatingTotalIncome();
     }
 
     public void registerClient(Client client) {
@@ -185,7 +180,7 @@ public class ManagerHotel {
         return roomService.getRoomDetails(roomNumber);
     }
 
-    public String getNameHotel() {
-        return nameHotel;
-    }
+//    public String getNameHotel() {
+//        return nameHotel;
+//    }
 }

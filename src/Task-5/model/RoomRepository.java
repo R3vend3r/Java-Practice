@@ -41,7 +41,6 @@ public class RoomRepository implements IRoomRepository {
     @Override
     public void changeRoomCondition(int number, RoomCondition newStatus) {
         Objects.requireNonNull(newStatus, "Status cannot be null");
-
         Room target = rooms.get(number);
         if (target != null) {
             target.setRoomCondition(newStatus);
@@ -50,7 +49,6 @@ public class RoomRepository implements IRoomRepository {
 
     @Override
     public void changeRoomPrice(int number, double newPrice) {
-
         Room target = rooms.get(number);
         if (target != null) {
             target.setPriceForDay(newPrice);
@@ -61,19 +59,20 @@ public class RoomRepository implements IRoomRepository {
     public void assignClientToRoom(int roomNumber, String clientId, Date availableDate) {
         Objects.requireNonNull(clientId, "Client ID cannot be null");
         Objects.requireNonNull(availableDate, "Available date cannot be null");
-
         Room room = rooms.get(roomNumber);
-        if (room != null) {
-            room.setClientIdAndDateAvailable(clientId, availableDate);
-            return;
+        if (room == null) {
+            throw new IllegalArgumentException("Room with number " + roomNumber + " does not exist");
         }
-        System.out.println("Ошибка в комнате");
+        room.setClientIdAndDateAvailable(clientId, availableDate);
     }
 
     @Override
     public String getAssignedClientId(int roomNumber) {
         Room room = rooms.get(roomNumber);
-        return room != null ? room.getClientId() : null;
+        if (room == null) {
+            throw new IllegalArgumentException("Room with number " + roomNumber + " does not exist");
+        }
+        return room.getClientId();
     }
 
     @Override
@@ -89,7 +88,6 @@ public class RoomRepository implements IRoomRepository {
     @Override
     public Map<Integer, Room> getRoomsByCondition(RoomCondition condition) {
         Objects.requireNonNull(condition, "Condition cannot be null");
-
         return rooms.values().stream()
                 .filter(room -> room.getRoomCondition() == condition)
                 .collect(Collectors.toMap(
@@ -103,7 +101,6 @@ public class RoomRepository implements IRoomRepository {
     @Override
     public Map<Integer, Room> getAvailableRoomsByDate(Date date) {
         Objects.requireNonNull(date, "Date cannot be null");
-
         return rooms.values().stream()
                 .filter(room -> {
                     Date availableDate = room.getAvailableDate();
@@ -130,9 +127,7 @@ public class RoomRepository implements IRoomRepository {
 
     private Map<Integer, Room> filterAndSortRooms(SortType sortType, boolean onlyAvailable) {
         Objects.requireNonNull(sortType, "Sort type cannot be null");
-
         Comparator<Room> comparator = getComparator(sortType);
-
         return rooms.values().stream()
                 .filter(room -> !onlyAvailable || room.isAvailable())
                 .sorted(comparator)
@@ -171,11 +166,14 @@ public class RoomRepository implements IRoomRepository {
     @Override
     public double calculateStayCost(int roomNumber, Date endDate) {
         Objects.requireNonNull(endDate, "End date cannot be null");
-
         Room room = rooms.get(roomNumber);
-        if (room == null) return 0.0;
-
+        if (room == null) {
+            throw new IllegalArgumentException("Room " + roomNumber + " does not exist");
+        }
         Date now = new Date();
+        if (endDate.before(now)) {
+            throw new IllegalArgumentException("End date cannot be in the past");
+        }
         return room.getPriceForDay() * calculateDaysBetween(now, endDate);
     }
 
