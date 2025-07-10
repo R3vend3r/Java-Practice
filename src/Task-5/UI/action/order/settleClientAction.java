@@ -5,9 +5,12 @@ import enums.SortType;
 import model.Client;
 import Controller.ManagerHotel;
 import model.Room;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class settleClientAction implements Action {
@@ -25,7 +28,6 @@ public class settleClientAction implements Action {
         try {
             System.out.println("\n=== Заселение клиента ===");
 
-            // Регистрация клиента
             System.out.print("Имя: ");
             String name = scanner.nextLine().trim();
             System.out.print("Фамилия: ");
@@ -39,7 +41,6 @@ public class settleClientAction implements Action {
             Client client = new Client(name, surname);
             manager.registerClient(client);
 
-            // Получаем свободные номера
             List<Room> availableRooms = manager.getRooms(SortType.NONE, true).values()
                     .stream()
                     .filter(Room::isAvailable)
@@ -50,12 +51,10 @@ public class settleClientAction implements Action {
                 return;
             }
 
-            // Вывод свободных номеров
             System.out.println("\nДоступные номера:");
             availableRooms.forEach(r -> System.out.printf("%d - %s (%.2f руб.)%n",
                     r.getNumberRoom(), r.getType(), r.getPriceForDay()));
 
-            // Выбор номера
             System.out.print("\nНомер для заселения: ");
             int roomNumber = scanner.nextInt();
             scanner.nextLine();
@@ -70,7 +69,6 @@ public class settleClientAction implements Action {
                 return;
             }
 
-            // Дата выезда
             System.out.print("Дата выезда (дд.мм.гг): ");
             String dateStr = scanner.nextLine();
             // Добавляем "20" если введен короткий год
@@ -79,13 +77,11 @@ public class settleClientAction implements Action {
             }
             Date checkOut = dateFormat.parse(dateStr);
 
-            // Проверка что дата выезда в будущем
             if(checkOut.before(new Date())) {
                 System.out.println("Ошибка: дата выезда должна быть в будущем");
                 return;
             }
 
-            // Подтверждение
             System.out.printf("%nПодтвердите заселение:%n%s %s (ID: %s) в номер %d до %s%n",
                     client.getName(), client.getSurname(), client.getClientId(),
                     room.getNumberRoom(), new SimpleDateFormat("dd.MM.yyyy").format(checkOut));
@@ -98,11 +94,18 @@ public class settleClientAction implements Action {
             } else {
                 System.out.println("Заселение отменено");
             }
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка ввода: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            System.err.println("Ошибка выбора: " + e.getMessage());
+        } catch (ParseException e) {
+            System.err.println("Ошибка формата даты: используйте дд.мм.гг (например: 15.07.25)");
+        } catch (IllegalStateException e) {
+            System.err.println("Ошибка операции: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Ошибка: " + e.getMessage());
-            if (e.getMessage().contains("Unparseable date")) {
-                System.out.println("Используйте формат дд.мм.гг (например: 15.07.25)");
-            }
+            System.err.println("Неожиданная ошибка: " + e.getMessage());
+        } finally {
+            scanner.nextLine();
         }
     }
 }

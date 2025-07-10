@@ -3,6 +3,7 @@ package UI.action.room;
 import UI.action.Action;
 import Controller.ManagerHotel;
 import java.util.Scanner;
+import java.util.InputMismatchException;
 
 public class getRoomDetailsAction implements Action {
     private final ManagerHotel manager;
@@ -14,10 +15,21 @@ public class getRoomDetailsAction implements Action {
 
     @Override
     public void execute() {
-        System.out.print("\nВведите номер комнаты: ");
-        int roomNumber = scanner.nextInt();
-        scanner.nextLine();
+        try {
+            System.out.print("\nВведите номер комнаты: ");
+            int roomNumber = scanner.nextInt();
+            scanner.nextLine();
 
-        System.out.println(manager.getRoomDetails(roomNumber));
+            String roomDetails = manager.getRoomDetails(roomNumber);
+            System.out.println(roomDetails);
+
+        } catch (InputMismatchException e) {
+            System.err.println("Ошибка: Номер комнаты должен быть целым числом");
+            scanner.nextLine();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Неожиданная ошибка: " + e.getMessage());
+        }
     }
 }

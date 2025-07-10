@@ -44,7 +44,6 @@ public class Builder implements Action {
         sortRoomsMenu.addMenuItem(new MenuItem("По звездам", actionFactory.getAllRoomsSortedByStarsAction(), null));
         sortRoomsMenu.addMenuItem(new MenuItem("По типу", actionFactory.getAllRoomsSortedByTypeAction(), null));
 
-        // Сортировка свободных номеров
         Menu sortAvailableRoomsMenu = new Menu("Сортировка свободных номеров");
         sortAvailableRoomsMenu.addMenuItem(new MenuItem("По цене", actionFactory.getAllAvailableRoomsSortedByPriceAction(), null));
         sortAvailableRoomsMenu.addMenuItem(new MenuItem("По вместимости", actionFactory.getAllAvailableRoomsSortedByCapacityAction(), null));
@@ -56,7 +55,6 @@ public class Builder implements Action {
         viewRoomsMenu.addMenuItem(new MenuItem("Сортировка свободных", null, sortAvailableRoomsMenu));
         roomsMenu.addMenuItem(new MenuItem("Просмотр номеров", null, viewRoomsMenu));
 
-        // Детали номера
         roomsMenu.addMenuItem(new MenuItem("Детали номера", actionFactory.getRoomDetailsAction(), null));
 
         return roomsMenu;
@@ -65,16 +63,13 @@ public class Builder implements Action {
     private Menu buildClientsMenu() {
         Menu clientsMenu = new Menu("Управление клиентами");
 
-        // Основные операции
         clientsMenu.addMenuItem(new MenuItem("Зарегистрировать и поселить", actionFactory.settleClientAction(), null));
         clientsMenu.addMenuItem(new MenuItem("Выселить клиента", actionFactory.evictClientAction(), null));
         clientsMenu.addMenuItem(new MenuItem("Найти клиента", actionFactory.findClientByIdAction(), null));
 
-        // Просмотр клиентов
         Menu viewClientsMenu = new Menu("Просмотр клиентов");
         viewClientsMenu.addMenuItem(new MenuItem("Все клиенты", actionFactory.getAllClientsSortedByNoneAction(), null));
 
-        // Сортировка клиентов
         Menu sortClientsMenu = new Menu("Сортировка клиентов");
         sortClientsMenu.addMenuItem(new MenuItem("По алфавиту", actionFactory.getAllClientsSortedByAlphabetAction(), null));
         sortClientsMenu.addMenuItem(new MenuItem("По дате выезда", actionFactory.getAllClientsSortedByDateEndAction(), null));
@@ -88,15 +83,12 @@ public class Builder implements Action {
     private Menu buildAmenitiesMenu() {
         Menu amenitiesMenu = new Menu("Управление услугами");
 
-        // Основные операции
         amenitiesMenu.addMenuItem(new MenuItem("Добавить услугу", actionFactory.addAmenityAction(), null));
         amenitiesMenu.addMenuItem(new MenuItem("Изменить цену услуги", actionFactory.updateAmenityPriceAction(), null));
 
-        // Просмотр услуг
         Menu viewAmenitiesMenu = new Menu("Просмотр услуг");
         viewAmenitiesMenu.addMenuItem(new MenuItem("Все услуги", actionFactory.getAllAmenityAction(), null));
 
-        // Сортировка услуг
         Menu sortAmenitiesMenu = new Menu("Сортировка услуг");
         sortAmenitiesMenu.addMenuItem(new MenuItem("По цене", actionFactory.getAllAmenitiesSortedByPriceAction(), null));
         sortAmenitiesMenu.addMenuItem(new MenuItem("По названию", actionFactory.getAllAmenitiesSortedByNameAction(), null));
@@ -104,7 +96,6 @@ public class Builder implements Action {
         viewAmenitiesMenu.addMenuItem(new MenuItem("Сортировка", null, sortAmenitiesMenu));
         amenitiesMenu.addMenuItem(new MenuItem("Просмотр услуг", null, viewAmenitiesMenu));
 
-        // Услуги клиента
         Menu clientAmenitiesMenu = new Menu("Услуги клиента");
         clientAmenitiesMenu.addMenuItem(new MenuItem("Все услуги клиента", actionFactory.getAmenitiesClientSortedByNoneAction(), null));
         clientAmenitiesMenu.addMenuItem(new MenuItem("Сортировка по дате", actionFactory.getAmenitiesClientSortedByDateAction(), null));
@@ -118,12 +109,10 @@ public class Builder implements Action {
     private Menu buildReportsMenu() {
         Menu reportsMenu = new Menu("Отчеты и аналитика");
 
-        // Основная статистика
         reportsMenu.addMenuItem(new MenuItem("Количество свободных номеров", actionFactory.getTotalCountAvailableRooms(), null));
         reportsMenu.addMenuItem(new MenuItem("Количество клиентов", actionFactory.getTotalServicedClientAction(), null));
         reportsMenu.addMenuItem(new MenuItem("Общий доход", actionFactory.showTotalRevenueAction(), null));
 
-        // История бронирований
         Menu bookingHistoryMenu = new Menu("История бронирований");
         bookingHistoryMenu.addMenuItem(new MenuItem("Последние 3 постояльца", actionFactory.getLastThreeRoomClientsAction(), null));
         bookingHistoryMenu.addMenuItem(new MenuItem("Все завершенные бронирования", actionFactory.getAllCompletedBookingsAction(), null));

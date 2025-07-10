@@ -2,6 +2,8 @@ package UI.action.order;
 
 import UI.action.Action;
 import Controller.ManagerHotel;
+
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class evictClientAction implements Action {
@@ -31,6 +33,10 @@ public class evictClientAction implements Action {
                     },
                     () -> System.out.println("Номер свободен или не существует")
             );
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка ввода: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            System.err.println("Ошибка поиска: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Ошибка: " + e.getMessage());
         }

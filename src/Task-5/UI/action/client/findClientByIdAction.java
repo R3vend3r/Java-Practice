@@ -2,6 +2,8 @@ package UI.action.client;
 
 import UI.action.Action;
 import Controller.ManagerHotel;
+
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class findClientByIdAction implements Action {
@@ -13,13 +15,25 @@ public class findClientByIdAction implements Action {
     }
 
     @Override
-    public void execute() {
-        System.out.print("\nПоиск клиента\nID клиента: ");
-        String id = scanner.nextLine();
-
-        manager.findClientById(id).ifPresentOrElse(
-                System.out::println,
-                () -> System.out.println("Клиент не найден")
-        );
+    public void execute() throws IllegalArgumentException {
+        try {
+            System.out.println("\n=== Поиск клиента ===");
+            System.out.print("Введите ID клиента: ");
+            String id = scanner.nextLine().trim();
+            if (id.isEmpty()) {
+                throw new IllegalArgumentException("ID клиента не может быть пустым");
+            }
+            manager.findClientById(id)
+                    .ifPresentOrElse(
+                            client -> System.out.println("\nНайден клиент:\n" + client),
+                            () -> { throw new NoSuchElementException("Клиент с ID '" + id + "' не найден"); }
+                    );
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка ввода: " + e.getMessage());
+        } catch (NoSuchElementException e) {
+            System.err.println("Ошибка поиска: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Системная ошибка: " + e.getMessage());
+        }
     }
 }
