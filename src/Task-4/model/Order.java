@@ -1,56 +1,28 @@
 package model;
 
+import interfaceClass.*;
 import java.util.Date;
 
-public class Order {
-    private int getId;
-    private static int id = 0;
-    private Room room;
-    private Client client;
-    private Amenity service;
-    private double price;
-    private  Date startDate;
-    private  Date endDate;
+public abstract class Order{
+    private final int id;
+    private static int nextId = 0;
+    private final Client client;
+    private final Date creationDate;
+    private final Date availableDate;
+    private double totalPrice;
 
-    public Order(Client client, Room room, Date startDate, Date dateOut, double price) {
-        this.getId = id++;
-        this.room = room;
-        this.price = price;
-        this.startDate = startDate;
-        this.endDate = dateOut;
+    protected Order(Client client, Date creationDate, Date availableDate) {
+        this.id = nextId++;
         this.client = client;
+        this.creationDate = creationDate;
+        this.availableDate = availableDate;
     }
 
-    public Order(Client client, Amenity service,Date date, double price) {
-        this.client = client;
-        this.service = service;
-        this.price = price;
-        this.endDate = date;
-    }
+    public int getId() { return id; }
+    public Client getClient() { return client; }
+    public Date getCreationDate() { return creationDate; }
+    public Date getAvailableDate() { return availableDate; }
+    public double getTotalPrice() { return totalPrice; }
 
-    public Client getClient() {
-        return client;
-    }
-
-    public Room getRoom() {
-        return room;
-    }
-
-
-    public Amenity getService() {
-        return service;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Date getDateOut() {
-        return endDate;
-    }
-
-    public Order getInfoById(int id){
-        return null;
-    }
-
+    protected void setTotalPrice(double price) { this.totalPrice = price; }
 }

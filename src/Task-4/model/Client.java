@@ -1,19 +1,20 @@
 package model;
+
+import interfaceClass.*;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Client {
     private String name;
     private String surname;
-    private final String id;
+    private final String clientId;
+    private int roomNumber;
 
-    public Client(String surname, String name) {
-        this.surname = surname;
+    public Client(String name, String surname) {
         this.name = name;
-        this.id = generateId();
-    }
-
-    private String generateId() {
-        return "CL-" + UUID.randomUUID().toString().substring(0, 8);
+        this.surname = surname;
+        this.clientId = "CL-" + UUID.randomUUID().toString().substring(0, 8);
+        this.roomNumber = -1;
     }
 
     public String getName() {
@@ -33,7 +34,23 @@ public class Client {
     }
 
     public String getClientId() {
-        return id;
+        return clientId;
     }
 
+    public int getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(int roomNumber) {
+        if (roomNumber < -1) {
+            throw new IllegalArgumentException("Room number cannot be negative");
+        }
+        this.roomNumber = roomNumber;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Client[name=%s, surname=%s, id=%s, room=%d]",
+                name, surname, clientId, roomNumber);
+    }
 }

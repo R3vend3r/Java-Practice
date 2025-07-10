@@ -2,74 +2,98 @@ package service;
 
 import enums.RoomCondition;
 import enums.SortType;
-import model.Client;
+import interfaceClass.*;
 import model.Room;
-import model.RoomCol;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public class RoomService {
-    private final RoomCol roomCol;
+    private final IRoomRepository roomRepository;
 
-    public RoomService() {
-        this.roomCol = new RoomCol();
+    public RoomService(IRoomRepository roomRepository) {
+        this.roomRepository = Objects.requireNonNull(roomRepository, "RoomRepository cannot be null");
     }
 
-    public void addRoom(Room newRoom) {
-        roomCol.createRoom(newRoom);
+    public void addRoom(Room room) {
+        roomRepository.addRoom(room);
     }
 
-    public void clearRoom(int roomNumber) {
-        roomCol.clearRoom(roomNumber);
-    }
-
-    public void deleteRoom(Room room) {
-        roomCol.deleteRoom(room);
-    }
-
-    public void changeRoomPrice(Room room, double newPrice) {
-        roomCol.changeRoomPrice(room, newPrice);
-    }
-
-    public void changeRoomCondition(Room room, RoomCondition status) {
-        roomCol.changeRoomCondition(room, status);
-    }
-
-    public List<Room> getAvailableRoomsByDate(Date date) {
-        return roomCol.getAvailableRoomsByDate(date);
-    }
-
-    public Map<Integer, Room> getSortedRooms(SortType sortType) {
-        return roomCol.getSortedRooms(sortType);
-    }
-
-    public Map<Integer, Room> getSortedAvailableRooms(SortType sortType) {
-        return roomCol.getSortedRooms(sortType, true);
-    }
-
-    public String getRoomDetails(int roomNumber) {
-        return roomCol.getRoomDetails(roomNumber);
-    }
-
-    public double calculateRoomPayment(Client client, Room room, Date dateEnd) {
-        return roomCol.getPayment(client, room, dateEnd);
-    }
-
-    public int getNumberAvailableRooms() {
-        return roomCol.getNumberAvailableRooms();
-    }
-
-    public boolean isRoomAvailable(int numberRoom) {
-        return roomCol.isRoomAvailable(numberRoom);
+    public Optional<Room> findRoom(int roomNumber) {
+        return roomRepository.findRoomByNumber(roomNumber);
     }
 
     public void markRoomOccupied(Room room) {
-        roomCol.markRoomOccupied(room);
+        Objects.requireNonNull(room, "Room cannot be null");
+        roomRepository.markRoomOccupied(room);
     }
 
-    public boolean getRoom(Room room) {
-        return roomCol.containsRoom(room);
+    public void clearRoom(int roomNumber) {
+        roomRepository.clearRoom(roomNumber);
+    }
+
+    public void updateRoomStatus(int number, RoomCondition status) {
+        Objects.requireNonNull(status, "Status cannot be null");
+        roomRepository.changeRoomCondition(number, status);
+    }
+
+    public void updateRoomPrice(int number, double newPrice) {
+        roomRepository.changeRoomPrice(number, newPrice);
+    }
+
+    public void assignClientToRoom(int roomNumber, String clientId, Date availableDate) {
+        Objects.requireNonNull(clientId, "Client ID cannot be null");
+        Objects.requireNonNull(availableDate, "Available date cannot be null");
+        roomRepository.assignClientToRoom(roomNumber, clientId, availableDate);
+    }
+
+    public Optional<String> getAssignedClient(int roomNumber) {
+        return Optional.ofNullable(roomRepository.getAssignedClientId(roomNumber));
+    }
+
+    public Map<Integer, Room> getAllRooms() {
+        return roomRepository.getAllRooms();
+    }
+
+    public Map<Integer, Room> getAvailableRooms() {
+        return roomRepository.getAvailableRooms();
+    }
+
+    public Map<Integer, Room> getRoomsByCondition(RoomCondition condition) {
+        Objects.requireNonNull(condition, "Condition cannot be null");
+        return roomRepository.getRoomsByCondition(condition);
+    }
+
+    public Map<Integer, Room> getAvailableRoomsByDate(Date date) {
+        return roomRepository.getAvailableRoomsByDate(date);
+    }
+
+    public Map<Integer, Room> getSortedRooms(SortType sortType) {
+        Objects.requireNonNull(sortType, "Sort type cannot be null");
+        return roomRepository.getSortedRooms(sortType);
+    }
+
+    public Map<Integer, Room> getSortedAvailableRooms(SortType sortType) {
+        Objects.requireNonNull(sortType, "Sort type cannot be null");
+        return roomRepository.getSortedAvailableRooms(sortType);
+    }
+
+    public boolean isRoomAvailable(int roomNumber) {
+        return roomRepository.isRoomAvailable(roomNumber);
+    }
+
+    public int countAvailableRooms() {
+        return roomRepository.countAvailableRooms();
+    }
+
+    public double calculateStayCost(int roomNumber, Date endDate) {
+        Objects.requireNonNull(endDate, "End date cannot be null");
+        return roomRepository.calculateStayCost(roomNumber, endDate);
+    }
+
+    public String getRoomDetails(int roomNumber) {
+        return roomRepository.getRoomDetails(roomNumber);
     }
 }

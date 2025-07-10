@@ -5,6 +5,7 @@ public enum SortType {
     PRICE,
     ALPHABET,
     DATE_END,
+    TYPE,
     NONE,
     STARS;
 }

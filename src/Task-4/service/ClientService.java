@@ -1,33 +1,46 @@
+
 package service;
 
+import interfaceClass.*;
 import model.Client;
-import model.ClientCol;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ClientService {
-    private ClientCol clientCol;
+    private final IClientRepository clientRepository;
 
-    public ClientService() {
-        this.clientCol = new ClientCol();
+    public ClientService(IClientRepository clientRepository) {
+        this.clientRepository = Objects.requireNonNull(clientRepository,
+                "ClientRepository cannot be null");
     }
 
-    public void registerClient(Client client){
-        clientCol.addClient(client);
+    public void registerClient(Client client) {
+        clientRepository.addClient(client);
     }
 
-    public boolean checkClient(Client client){
-        if (client == null || clientCol== null) {
-            return false;
-        }
-        return clientCol.checkClientInList(client.getClientId());
+    public Optional<Client> findClientByRoomNumber(int roomNumber) {
+        return clientRepository.findClientByRoomNumber(roomNumber);
+    }
+
+    public int getClientCount(){
+        return clientRepository.getClientCount();
     }
 
     public Optional<Client> findClientById(String clientId) {
-        return clientCol.findClientById(clientId);
+        return clientRepository.findClientById(clientId);
     }
 
-    public int getClientCount() {
-        return clientCol.getCountClients();
+    public void removeClientByRoomNumber(int roomNumber) {
+        clientRepository.removeClientByRoomNumber(roomNumber);
+    }
+
+    public void assignRoomToClient(String clientId, int roomNumber) {
+        clientRepository.assignRoomToClient(clientId, roomNumber);
+    }
+
+    public List<Client> getAllClients(){
+        return clientRepository.getAllClients();
     }
 }

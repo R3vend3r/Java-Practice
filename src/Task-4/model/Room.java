@@ -1,58 +1,70 @@
 package model;
+
 import enums.RoomCondition;
+import enums.RoomType;
 
 import java.util.Date;
+import java.util.Objects;
 
-public class Room {
-    private int numberRoom;
-    private static int roomCount = 0;
+public class Room{
+    private final int numberRoom;
     private boolean isAvailable;
     private RoomCondition roomCondition;
-
+    private final RoomType type;
     private double priceForDay;
     private Date availableDate;
     private int capacity;
     private int stars;
+    private String clientId;
 
-    public Room(int numberRoom, double priceForDay, int capacity) {
+    public Room(int numberRoom, RoomType type, double priceForDay, int capacity) {
         if (priceForDay <= 0) {
             throw new IllegalArgumentException("Price must be positive");
         }
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
+
         this.numberRoom = numberRoom;
-        ++roomCount;
-        isAvailable = true;
-        roomCondition = RoomCondition.READY;
+        this.type = Objects.requireNonNull(type);
+        this.isAvailable = true;
+        this.roomCondition = RoomCondition.READY;
         this.priceForDay = priceForDay;
+        this.capacity = capacity;
+        this.stars = 3; // default value
     }
 
-
-
-    public void clearRoom(){
+    public void clearRoom() {
         isAvailable = true;
         roomCondition = RoomCondition.CLEANING_REQUIRED;
+        clientId = null;
+        availableDate = null;
     }
 
     public int getNumberRoom() {
         return numberRoom;
     }
 
-    public void needRepair(){
-        roomCondition = RoomCondition.ON_REPAIR;
-        isAvailable = false;
-    }
-
-    public void setNumberRoom(int numberRoom) {
-        this.numberRoom = numberRoom;
-    }
-
-    public boolean getEmpty() {
+    public boolean isAvailable() {
         return isAvailable;
     }
 
-    public void changeAvailable(){
+    public void changeAvailability() {
         this.isAvailable = !isAvailable;
     }
 
+    public RoomType getType() {
+        return type;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientIdAndDateAvailable(String clientId, Date availableDate) {
+        this.clientId = Objects.requireNonNull(clientId);
+        this.availableDate = Objects.requireNonNull(availableDate);
+    }
 
     public double getPriceForDay() {
         return priceForDay;
@@ -65,7 +77,7 @@ public class Room {
         this.priceForDay = priceForDay;
     }
 
-    public Date getAvailableDate(){
+    public Date getAvailableDate() {
         return availableDate;
     }
 
@@ -73,35 +85,42 @@ public class Room {
         return roomCondition;
     }
 
-
     public void setRoomCondition(RoomCondition status) {
-        this.roomCondition = status;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
-    public void setStars(int stars) {
-        this.stars = stars;
+        this.roomCondition = Objects.requireNonNull(status);
     }
 
     public int getCapacity() {
         return capacity;
     }
 
+    public void setCapacity(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
+        this.capacity = capacity;
+    }
+
     public int getStars() {
         return stars;
     }
 
+    public void setStars(int stars) {
+        if (stars < 1 || stars > 5) {
+            throw new IllegalArgumentException("Stars must be between 1 and 5");
+        }
+        this.stars = stars;
+    }
 
     @Override
     public String toString() {
-        return "model.Room{" +
-                "numberRoom=" + numberRoom +
-                ", isAvailable=" + isAvailable +
-                ", status=" + roomCondition +
-                ", priceForDay=" + priceForDay +
+        return "Room{" +
+                "number=" + numberRoom +
+                ", type=" + type +
+                ", available=" + isAvailable +
+                ", condition=" + roomCondition +
+                ", price=" + priceForDay +
+                ", capacity=" + capacity +
+                ", stars=" + stars +
                 '}';
     }
 }

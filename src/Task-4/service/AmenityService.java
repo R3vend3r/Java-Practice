@@ -1,42 +1,46 @@
 package service;
 
-import model.Amenity;
-import model.AmenityCol;
+import interfaceClass.*;
+import model.*;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class AmenityService {
-    private final AmenityCol amenityCol;
+    private final IAmenityRepository amenityRepository;
 
-    public AmenityService() {
-        this.amenityCol = new AmenityCol();
+    public AmenityService(IAmenityRepository amenityRepository) {
+        this.amenityRepository = Objects.requireNonNull(amenityRepository,
+                "AmenityRepository cannot be null");
     }
 
     public void addAmenity(Amenity amenity) {
-        amenityCol.addAmenity(amenity);
+        amenityRepository.addAmenity(amenity);
     }
 
-    public boolean hasAmenity(Amenity amenity) {
-        return amenityCol.containsAmenity(amenity);
+    public boolean amenityExists(String amenityName) {
+        return amenityRepository.containsAmenity(amenityName);
     }
 
-    public void changeAmenityPrice(Amenity amenity, double newPrice) {
-        if (amenity != null && amenityCol.containsAmenity(amenity)) {
-            amenity.setPrice(newPrice);
-        }
+    public void updateAmenityPrice(String amenityName, double newPrice) {
+        amenityRepository.updateAmenityPrice(amenityName, newPrice);
     }
 
-    public List<Amenity> getAllAmenity() {
-        return amenityCol.getAllAmenities();
+    public List<Amenity> getAllAmenities() {
+        return amenityRepository.getAllAmenities();
     }
 
     public List<Amenity> getAmenitiesSortedByPrice() {
-        return amenityCol.getSortedAmenities(Comparator.comparingDouble(Amenity::getPrice));
+        return amenityRepository.getSortedAmenities(Comparator.comparingDouble(Amenity::getPrice));
     }
 
     public List<Amenity> getAmenitiesSortedByName() {
-        return amenityCol.getSortedAmenities(Comparator.comparing(Amenity::getName));
+        return amenityRepository.getSortedAmenities(Comparator.comparing(Amenity::getName));
+    }
+
+    public Optional<Amenity> findAmenityByName(String name) {
+        return amenityRepository.findAmenityByName(name);
     }
 }

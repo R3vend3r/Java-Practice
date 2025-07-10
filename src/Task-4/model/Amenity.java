@@ -1,12 +1,26 @@
 package model;
 
-public class Amenity {
-    private  double price;
+import interfaceClass.*;
+import java.util.Objects;
+
+public class Amenity{
     private String name;
+    private double price;
 
     public Amenity(String name, double price) {
-        this.price = price;
-        this.name = name;
+        setName(name);
+        setPrice(price);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = Objects.requireNonNull(name, "Amenity name cannot be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Amenity name cannot be blank");
+        }
     }
 
     public double getPrice() {
@@ -20,12 +34,18 @@ public class Amenity {
         this.price = price;
     }
 
-    public String getName() {
-        return name;
+    public String toString() {
+        return String.format("Amenity[name=%s, price=%.2f]", name, price);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Amenity amenity = (Amenity) o;
+        return name.equals(amenity.name);
     }
 
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }
