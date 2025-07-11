@@ -33,7 +33,7 @@ public class ClientCsvService implements ICsvService<Client> {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 new FileInputStream(filePath), "UTF-8"))) {
 
-            reader.readLine(); // Skip header
+            reader.readLine();
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = CsvUtils.parseCsvLine(line);

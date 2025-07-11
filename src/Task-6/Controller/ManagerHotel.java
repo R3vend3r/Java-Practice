@@ -1,5 +1,7 @@
 package Controller;
 
+import csv.*;
+import Exception.*;
 import enums.RoomCondition;
 import enums.SortType;
 import interfaceClass.*;
@@ -11,12 +13,19 @@ import service.*;
 
 public class ManagerHotel {
 //    private String nameHotel;
+private static final ManagerHotel INSTANCE = new ManagerHotel();
     private final RoomService roomService;
     private final AmenityService amenityService;
     private final ClientService clientService;
     private final OrderService orderService;
+    private final ICsvService<Room> roomCsvService;
+    private final ICsvService<Amenity> amenityCsvService;
+    private final ICsvService<Client> clientCsvService;
+    private final ICsvService<RoomBooking> roomBookingCsvService;
+    private final ICsvService<AmenityOrder> amenityOrderCsvService;
 
-    public ManagerHotel() {
+
+    private ManagerHotel() {
         IRoomRepository roomRepository = new RoomRepository();
         IAmenityRepository amenityRepository = new AmenityRepository();
         IClientRepository clientRepository = new ClientRepository();
@@ -26,6 +35,15 @@ public class ManagerHotel {
         this.amenityService = new AmenityService(amenityRepository);
         this.clientService = new ClientService(clientRepository);
         this.orderService = new OrderService(orderRepository);
+        this.roomCsvService = new RoomCsvService();
+        this.amenityCsvService = new AmenityCsvService();
+        this.clientCsvService = new ClientCsvService();
+        this.roomBookingCsvService = new RoomBookingCsvService();
+        this.amenityOrderCsvService = new AmenityOrderCsvService();
+    }
+
+    public static ManagerHotel getInstance() {
+        return INSTANCE;
     }
 
 //    public ManagerHotel(String nameHotel) {
@@ -178,6 +196,107 @@ public class ManagerHotel {
 
     public String getRoomDetails(int roomNumber) {
         return roomService.getRoomDetails(roomNumber);
+    }
+
+    public void exportRoomsToCsv(String filePath) throws DataExportException {
+        roomCsvService.exportCsv(new ArrayList<>(roomService.getSortedRooms(SortType.NONE).values()), filePath);
+    }
+
+    public List<Room> importRoomsFromCsv(String filePath) throws DataImportException {
+        List<Room> importedRooms = roomCsvService.importCsv(filePath);
+        for (Room room : importedRooms) {
+            roomService.addRoom(room);
+        }
+        return importedRooms;
+    }
+
+    public void exportClientsToCsv(String filePath) throws DataExportException {
+        clientCsvService.exportCsv(clientService.getAllClients(), filePath);
+    }
+
+    public List<Client> importClientsFromCsv(String filePath) throws DataImportException {
+        List<Client> importedClients = clientCsvService.importCsv(filePath);
+        for (Client client : importedClients) {
+            clientService.registerClient(client);
+        }
+        return importedClients;
+    }
+
+    public void exportAmenitiesToCsv(String filePath) throws DataExportException {
+        amenityCsvService.exportCsv(amenityService.getAllAmenities(), filePath);
+    }
+
+    public List<Amenity> importAmenitiesFromCsv(String filePath) throws DataImportException {
+        List<Amenity> importedAmenities = amenityCsvService.importCsv(filePath);
+
+        for (Amenity amenity : importedAmenities) {
+            try {
+                Optional<Amenity> existingOpt = amenityService.findAmenityByName(amenity.getName());
+
+                if (existingOpt.isPresent()) {
+                    Amenity existing = existingOpt.get();
+                    existing.setPrice(amenity.getPrice());
+                    amenityService.updateAmenity(existing);
+                } else {
+                    amenityService.addAmenity(amenity);
+                }
+            } catch (Exception e) {
+                throw new DataImportException("Failed to import amenity '" + amenity.getName() + "': " + e.getMessage());
+            }
+        }
+        return importedAmenities;
+    }
+
+    public void exportRoomBookingsToCsv(String filePath) throws DataExportException {
+        List<RoomBooking> allBookings = new ArrayList<>();
+        allBookings.addAll(orderService.getActiveBookingsSorted(SortType.NONE));
+        allBookings.addAll(orderService.getCompletedBookings());
+        roomBookingCsvService.exportCsv(allBookings, filePath);
+    }
+
+    public List<RoomBooking> importRoomBookingsFromCsv(String filePath) throws DataImportException {
+        List<RoomBooking> importedBookings = roomBookingCsvService.importCsv(filePath);
+        for (RoomBooking booking : importedBookings) {
+            Client client = booking.getClient();
+            if (clientService.findClientById(client.getId()).isEmpty()) {
+                clientService.registerClient(client);
+            }
+
+            Room room = booking.getRoom();
+            if (roomService.findRoom(room.getNumberRoom()).isEmpty()) {
+                roomService.addRoom(room);
+            }
+
+            orderService.createRoomBooking(client, room, booking.getCreationDate(), booking.getCheckOutDate());
+        }
+        return importedBookings;
+    }
+
+    public void exportAmenityOrdersToCsv(String filePath) throws DataExportException {
+        List<AmenityOrder> amenityOrderList = new ArrayList<>(orderService.getAmenityOrdersSorted(SortType.NONE));
+        amenityOrderCsvService.exportCsv(amenityOrderList, filePath);
+    }
+
+    public List<AmenityOrder> importAmenityOrdersFromCsv(String filePath) throws DataImportException {
+        List<AmenityOrder> importedOrders = amenityOrderCsvService.importCsv(filePath);
+        for (AmenityOrder order : importedOrders) {
+            Client client = order.getClient();
+            if (clientService.findClientById(client.getId()).isEmpty()) {
+                clientService.registerClient(client);
+            }
+
+            Amenity amenity = order.getAmenity();
+            if (amenityService.findAmenityByName(amenity.getName()).isEmpty()) {
+                amenityService.addAmenity(amenity);
+            }
+
+            orderService.addAmenityToBooking(
+                    client.getRoomNumber(),
+                    amenity,
+                    order.getServiceDate()
+            );
+        }
+        return importedOrders;
     }
 
 //    public String getNameHotel() {

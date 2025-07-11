@@ -15,17 +15,21 @@ public class AmenityOrderCsvService implements ICsvService<AmenityOrder> {
         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(
                 new FileOutputStream(filePath), "UTF-8"))) {
 
-            writer.println("id,clientId,clientName,clientSurname,clientRoom,amenityId,creationDate,serviceDate,totalPrice");
+            writer.println("id,clientId,clientName,clientSurname,clientRoom,amenityId,amenityName,amenityPrice,creationDate,serviceDate,totalPrice");
 
             for (AmenityOrder order : orders) {
                 Client client = order.getClient();
-                writer.println(String.format("%s,%s,%s,%s,%d,%s,%s,%s,%.2f",
+                Amenity amenity = order.getAmenity();
+
+                writer.println(String.format("%s,%s,%s,%s,%d,%s,%s,%.2f,%s,%s,%.2f",
                         order.getId(),
                         client.getId(),
                         CsvUtils.escapeCsv(client.getName()),
                         CsvUtils.escapeCsv(client.getSurname()),
                         client.getRoomNumber(),
-                        order.getAmenity().getId(),
+                        amenity.getId(),
+                        CsvUtils.escapeCsv(amenity.getName()),
+                        amenity.getPrice(),
                         DATE_FORMAT.format(order.getCreationDate()),
                         DATE_FORMAT.format(order.getServiceDate()),
                         order.getTotalPrice()));
@@ -47,7 +51,7 @@ public class AmenityOrderCsvService implements ICsvService<AmenityOrder> {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = CsvUtils.parseCsvLine(line);
-                if (parts.length < 9) {
+                if (parts.length < 11) {
                     throw new DataImportException("Invalid data format in line: " + line);
                 }
 
@@ -59,17 +63,17 @@ public class AmenityOrderCsvService implements ICsvService<AmenityOrder> {
 
                 Amenity amenity = new Amenity(
                         parts[5],
-                        "Unknown",
-                        0.0);
+                        CsvUtils.unescapeCsv(parts[6]),
+                        Double.parseDouble(parts[7]));
 
                 AmenityOrder order = new AmenityOrder(
                         parts[0],
                         client,
+                        Double.parseDouble(parts[10]),
                         amenity,
-                        DATE_FORMAT.parse(parts[7]));
+                        DATE_FORMAT.parse(parts[9]));
 
-                order.setCreationDate(DATE_FORMAT.parse(parts[6]));
-                order.setTotalPrice(Double.parseDouble(parts[8]));
+                order.setCreationDate(DATE_FORMAT.parse(parts[8]));
 
                 orders.add(order);
             }

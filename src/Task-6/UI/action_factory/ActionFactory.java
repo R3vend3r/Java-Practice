@@ -51,4 +51,15 @@ public interface ActionFactory {
     public Action getTotalServicedClientAction();
     public Action showTotalRevenueAction();
     public Action getTotalCountAvailableRooms();
+
+    public Action importRoomsCsvAction();
+    public Action exportRoomsCsvAction();
+    public Action exportClientsCsvAction();
+    public Action importClientsCsvAction();
+    public Action exportAmenitiesCsvAction();
+    public Action importAmenitiesCsvAction();
+    public Action exportBookingsCsvAction();
+    public Action importBookingsCsvAction();
+    public Action exportAmenityOrdersCsvAction();
+    public Action importAmenityOrdersCsvAction();
 }

@@ -36,6 +36,11 @@ public class AmenityService {
         return amenityRepository.getSortedAmenities(Comparator.comparingDouble(Amenity::getPrice));
     }
 
+    public void updateAmenity(Amenity amenity) {
+        Objects.requireNonNull(amenity, "Amenity cannot be null");
+        amenityRepository.updateAmenity(amenity);
+    }
+
     public List<Amenity> getAmenitiesSortedByName() {
         return amenityRepository.getSortedAmenities(Comparator.comparing(Amenity::getName));
     }

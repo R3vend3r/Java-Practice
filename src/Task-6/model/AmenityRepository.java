@@ -60,4 +60,29 @@ public class AmenityRepository implements IAmenityRepository {
                 .filter(a -> a.getName().equalsIgnoreCase(name))
                 .findFirst();
     }
+
+    @Override
+    public void updateAmenity(Amenity amenity) {
+        Objects.requireNonNull(amenity, "Amenity cannot be null");
+
+        int index = -1;
+        for (int i = 0; i < amenities.size(); i++) {
+            if (amenities.get(i).getName().equalsIgnoreCase(amenity.getName())) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            throw new IllegalArgumentException("Amenity '" + amenity.getName() + "' not found");
+        }
+
+        amenities.set(index, amenity);
+    }
+
+    @Override
+    public void deleteAmenity(String amenityName) {
+        Objects.requireNonNull(amenityName, "Amenity name cannot be null");
+        amenities.removeIf(a -> a.getName().equalsIgnoreCase(amenityName));
+    }
 }

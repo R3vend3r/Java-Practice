@@ -10,15 +10,16 @@ public abstract class Order {
     private Date availableDate;
     private double totalPrice;
 
-    protected Order(String id, Client client, Date creationDate, Date availableDate) {
+    protected Order(String id, Client client, double totalPrice, Date creationDate, Date availableDate) {
         setId(id);
         setClient(client);
         setCreationDate(creationDate);
         setAvailableDate(availableDate);
+        setTotalPrice(totalPrice);
     }
 
-    protected Order(Client client, Date creationDate, Date availableDate) {
-        this(generateId(), client, creationDate, availableDate);
+    protected Order(Client client, double totalPrice, Date availableDate) {
+        this(generateId(), client, totalPrice, new Date(), availableDate);
     }
 
     static String generateId() {

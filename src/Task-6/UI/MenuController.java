@@ -14,7 +14,7 @@ public class MenuController {
     private Navigator navigator;
 
     private MenuController() {
-        this.dataManager = new ManagerHotel();
+        this.dataManager = ManagerHotel.getInstance();
         ActionFactory actionFactory = new ActionFactoryController(dataManager);
         this.builder = new Builder(actionFactory);
         this.navigator = new Navigator(builder.getRootMenu());

@@ -24,6 +24,9 @@ public class Builder implements Action {
         rootMenu.addMenuItem(new MenuItem("Отчеты", null, buildReportsMenu()));
 
         rootMenu.addMenuItem(new MenuItem("Операции", null, buildOperationsMenu()));
+
+        rootMenu.addMenuItem(new MenuItem("Импорт/Экспорт", null, buildImportExportMenu()));
+
     }
 
     private Menu buildRoomsMenu() {
@@ -131,6 +134,37 @@ public class Builder implements Action {
         operationsMenu.addMenuItem(new MenuItem("Добавить услугу клиенту", actionFactory.addAmenityToClientAction(), null));
 
         return operationsMenu;
+    }
+
+    private Menu buildImportExportMenu() {
+        Menu importExportMenu = new Menu("Импорт/Экспорт данных");
+
+        Menu roomsImportExport = new Menu("Номера");
+        roomsImportExport.addMenuItem(new MenuItem("Экспорт номеров в CSV", actionFactory.exportRoomsCsvAction(), null));
+        roomsImportExport.addMenuItem(new MenuItem("Импорт номеров из CSV", actionFactory.importRoomsCsvAction(), null));
+        importExportMenu.addMenuItem(new MenuItem("Номера", null, roomsImportExport));
+
+        Menu clientsImportExport = new Menu("Клиенты");
+        clientsImportExport.addMenuItem(new MenuItem("Экспорт клиентов в CSV", actionFactory.exportClientsCsvAction(), null));
+        clientsImportExport.addMenuItem(new MenuItem("Импорт клиентов из CSV", actionFactory.importClientsCsvAction(), null));
+        importExportMenu.addMenuItem(new MenuItem("Клиенты", null, clientsImportExport));
+
+        Menu amenitiesImportExport = new Menu("Услуги");
+        amenitiesImportExport.addMenuItem(new MenuItem("Экспорт услуг в CSV", actionFactory.exportAmenitiesCsvAction(), null));
+        amenitiesImportExport.addMenuItem(new MenuItem("Импорт услуг из CSV", actionFactory.importAmenitiesCsvAction(), null));
+        importExportMenu.addMenuItem(new MenuItem("Услуги", null, amenitiesImportExport));
+
+        Menu bookingsImportExport = new Menu("Бронирования");
+        bookingsImportExport.addMenuItem(new MenuItem("Экспорт бронирований в CSV", actionFactory.exportBookingsCsvAction(), null));
+        bookingsImportExport.addMenuItem(new MenuItem("Импорт бронирований из CSV", actionFactory.importBookingsCsvAction(), null));
+        importExportMenu.addMenuItem(new MenuItem("Бронирования", null, bookingsImportExport));
+
+        Menu amenityOrdersImportExport = new Menu("Заказы услуг");
+        amenityOrdersImportExport.addMenuItem(new MenuItem("Экспорт заказов в CSV", actionFactory.exportAmenityOrdersCsvAction(), null));
+        amenityOrdersImportExport.addMenuItem(new MenuItem("Импорт заказов из CSV", actionFactory.importAmenityOrdersCsvAction(), null));
+        importExportMenu.addMenuItem(new MenuItem("Заказы услуг", null, amenityOrdersImportExport));
+
+        return importExportMenu;
     }
 
     public Menu getRootMenu() {

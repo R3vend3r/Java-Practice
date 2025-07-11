@@ -11,4 +11,6 @@ public interface IAmenityRepository {
     List<Amenity> getAllAmenities();
     List<Amenity> getSortedAmenities(Comparator<Amenity> comparator);
     Optional<Amenity> findAmenityByName(String name);
+    void updateAmenity(Amenity amenity);
+    void deleteAmenity(String amenityName);
 }

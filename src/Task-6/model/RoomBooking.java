@@ -5,17 +5,22 @@ import java.util.*;
 public class RoomBooking extends Order {
     private Room room;
     private Date checkOutDate;
+    private double totalPrice;
     private final List<AmenityOrder> services;
 
-    public RoomBooking(String id, Client client, Room room, Date checkOutDate) {
-        super(id, client, new Date(), checkOutDate);
+    public RoomBooking(String id, Client client, Room room, double totalPrice, Date checkOutDate) {
+        super(id, client, totalPrice, new Date(), checkOutDate);
         setRoom(room);
         setCheckOutDate(checkOutDate);
+        setTotalPrice(totalPrice);
         this.services = new ArrayList<>();
     }
 
-    public RoomBooking(Client client, Room room, Date checkOutDate) {
-        this(generateId(), client, room, checkOutDate);
+    public RoomBooking(Client client, Room room, double totalPrice, Date checkOutDate) {
+        super(client, totalPrice, checkOutDate);
+        setRoom(room);
+        setCheckOutDate(checkOutDate);
+        this.services = new ArrayList<>();
     }
 
     public Room getRoom() {
@@ -33,6 +38,16 @@ public class RoomBooking extends Order {
     public void setCheckOutDate(Date checkOutDate) {
         this.checkOutDate = Objects.requireNonNull(checkOutDate, "Check-out date cannot be null");
         setAvailableDate(checkOutDate);
+    }
+
+    @Override
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    @Override
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
     public List<AmenityOrder> getServices() {

@@ -2,6 +2,7 @@ package UI.action_factory;
 
 import UI.action.Action;
 import UI.action.amenity.*;
+import UI.action.import_export.*;
 import UI.action.client.*;
 import UI.action.order.evictClientAction;
 import UI.action.order.getAllCompletedBookingsAction;
@@ -200,5 +201,55 @@ public class ActionFactoryController implements ActionFactory {
     @Override
     public Action getTotalCountAvailableRooms() {
         return new getTotalCountAvailableRooms(actionFactoryController);
+    }
+
+    @Override
+    public Action importRoomsCsvAction() {
+        return new importRoomsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action exportRoomsCsvAction() {
+        return new exportRoomsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action exportClientsCsvAction() {
+        return new exportClientsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action importClientsCsvAction() {
+        return new importClientsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action exportAmenitiesCsvAction() {
+        return new exportAmenitiesCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action importAmenitiesCsvAction() {
+        return new importAmenitiesCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action exportBookingsCsvAction() {
+        return new exportBookingsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action importBookingsCsvAction() {
+        return new importBookingsCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action exportAmenityOrdersCsvAction() {
+        return new exportAmenityOrdersCsvAction(actionFactoryController);
+    }
+
+    @Override
+    public Action importAmenityOrdersCsvAction() {
+        return new importAmenityOrdersCsvAction(actionFactoryController);
     }
 }
