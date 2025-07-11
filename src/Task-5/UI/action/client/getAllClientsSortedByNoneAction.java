@@ -20,7 +20,7 @@ public class getAllClientsSortedByNoneAction implements Action {
                     client.getName(),
                     client.getSurname(),
                     roomInfo,
-                    client.getClientId());
+                    client.getId());
         });
     }
 }

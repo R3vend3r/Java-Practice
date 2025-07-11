@@ -15,8 +15,8 @@ public class ClientRepository implements IClientRepository {
     public void addClient(Client client) throws IllegalArgumentException {
         Objects.requireNonNull(client, "Client cannot be null");
 
-        if (clientExists(client.getClientId())) {
-            throw new IllegalArgumentException("Client with ID " + client.getClientId() + " already exists");
+        if (clientExists(client.getId())) {
+            throw new IllegalArgumentException("Client with ID " + client.getId() + " already exists");
         }
 
         clients.add(client);
@@ -25,7 +25,7 @@ public class ClientRepository implements IClientRepository {
     @Override
     public boolean clientExists(String clientId) {
         Objects.requireNonNull(clientId, "Client ID cannot be null");
-        return clients.stream().anyMatch(c -> c.getClientId().equals(clientId));
+        return clients.stream().anyMatch(c -> c.getId().equals(clientId));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ClientRepository implements IClientRepository {
     public Optional<Client> findClientById(String clientId) {
         Objects.requireNonNull(clientId, "Client ID cannot be null");
         return clients.stream()
-                .filter(c -> c.getClientId().equals(clientId))
+                .filter(c -> c.getId().equals(clientId))
                 .findFirst();
     }
     @Override

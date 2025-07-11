@@ -53,9 +53,9 @@ public class ManagerHotel {
             throw new IllegalStateException("Room " + room.getNumberRoom() + " is not available");
         }
         orderService.createRoomBooking(client, room, new Date(), checkOutDate);
-        roomService.assignClientToRoom(room.getNumberRoom(), client.getClientId(), checkOutDate);
+        roomService.assignClientToRoom(room.getNumberRoom(), client.getId(), checkOutDate);
         roomService.markRoomOccupied(room);
-        clientService.assignRoomToClient(client.getClientId(), room.getNumberRoom());
+        clientService.assignRoomToClient(client.getId(), room.getNumberRoom());
     }
 
     public void evictClient(int roomNumber) {

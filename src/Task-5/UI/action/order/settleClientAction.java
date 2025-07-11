@@ -83,7 +83,7 @@ public class settleClientAction implements Action {
             }
 
             System.out.printf("%nПодтвердите заселение:%n%s %s (ID: %s) в номер %d до %s%n",
-                    client.getName(), client.getSurname(), client.getClientId(),
+                    client.getName(), client.getSurname(), client.getId(),
                     room.getNumberRoom(), new SimpleDateFormat("dd.MM.yyyy").format(checkOut));
             System.out.print("Подтвердить (да/нет)? ");
             String confirmation = scanner.nextLine();

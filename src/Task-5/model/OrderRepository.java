@@ -31,8 +31,8 @@ public class OrderRepository implements IOrderRepository {
             throw new IllegalArgumentException("CheckOut date must be after CheckIn date");
         }
         double price = room.getPriceForDay();
-        double totalPrice = calculateStayCost(price, checkInDate, checkOutDate);
-        RoomBooking booking = new RoomBooking(client, room, totalPrice, checkOutDate);
+//        double totalPrice = calculateStayCost(price, checkInDate, checkOutDate);
+        RoomBooking booking = new RoomBooking(client.getId(), client, room, checkOutDate);
         activeBookings.add(booking);
         completedBookings.add(booking);
     }

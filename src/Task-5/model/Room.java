@@ -7,31 +7,47 @@ import java.util.Date;
 import java.util.Objects;
 
 public class Room{
-    private final int numberRoom;
+    private String id;
+    private int numberRoom;
     private boolean isAvailable;
     private RoomCondition roomCondition;
-    private final RoomType type;
+    private RoomType type;
     private double priceForDay;
     private Date availableDate;
     private int capacity;
     private int stars;
     private String clientId;
 
-    public Room(int numberRoom, RoomType type, double priceForDay, int capacity) {
-        if (priceForDay <= 0) {
-            throw new IllegalArgumentException("Price must be positive");
-        }
-        if (capacity <= 0) {
-            throw new IllegalArgumentException("Capacity must be positive");
-        }
-
-        this.numberRoom = numberRoom;
-        this.type = Objects.requireNonNull(type);
+    public Room(String id, int number, RoomType type, double priceForDay, int capacity,
+                RoomCondition condition, int stars) {
+        setId(id);
+        setNumberRoom(number);
+        setType(type);
+        setPriceForDay(priceForDay);
+        setCapacity(capacity);
+        setRoomCondition(condition);
+        setStars(stars);
         this.isAvailable = true;
-        this.roomCondition = RoomCondition.READY;
-        this.priceForDay = priceForDay;
-        this.capacity = capacity;
-        this.stars = 3; // default value
+    }
+
+    public Room(int number, RoomType type, double priceForDay, int capacity) {
+        this(generateId(), number, type, priceForDay, capacity,
+                RoomCondition.READY, 3);
+    }
+
+    private static String generateId() {
+        return "RM-" + System.currentTimeMillis();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = Objects.requireNonNull(id, "Room ID cannot be null");
+        if (id.isBlank()) {
+            throw new IllegalArgumentException("Room ID cannot be blank");
+        }
     }
 
     public void clearRoom() {
@@ -98,6 +114,20 @@ public class Room{
             throw new IllegalArgumentException("Capacity must be positive");
         }
         this.capacity = capacity;
+    }
+
+    public void setNumberRoom(int numberRoom) {
+        this.numberRoom = numberRoom;
+    }
+
+
+    public void setType(RoomType type) {
+        this.type = type;
+    }
+
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public int getStars() {

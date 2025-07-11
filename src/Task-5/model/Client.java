@@ -1,18 +1,38 @@
 package model;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Client {
+    private String id;
     private String name;
     private String surname;
-    private final String clientId;
     private int roomNumber;
 
+    public Client(String id, String name, String surname, int roomNumber) {
+        setId(id);
+        setName(name);
+        setSurname(surname);
+        setRoomNumber(roomNumber);
+    }
+
     public Client(String name, String surname) {
-        this.name = name;
-        this.surname = surname;
-        this.clientId = "CL-" + UUID.randomUUID().toString().substring(0, 8);
-        this.roomNumber = -1;
+        this(generateId(), name, surname, -1);
+    }
+
+    private static String generateId() {
+        return "CL-" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = Objects.requireNonNull(id, "Client ID cannot be null");
+        if (id.isBlank()) {
+            throw new IllegalArgumentException("Client ID cannot be blank");
+        }
     }
 
     public String getName() {
@@ -20,7 +40,10 @@ public class Client {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Name cannot be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
     }
 
     public String getSurname() {
@@ -28,11 +51,10 @@ public class Client {
     }
 
     public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getClientId() {
-        return clientId;
+        this.surname = Objects.requireNonNull(surname, "Surname cannot be null");
+        if (surname.isBlank()) {
+            throw new IllegalArgumentException("Surname cannot be blank");
+        }
     }
 
     public int getRoomNumber() {
@@ -48,7 +70,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return String.format("Client[name=%s, surname=%s, id=%s, room=%d]",
-                name, surname, clientId, roomNumber);
+        return String.format("Client[id=%s, name=%s, surname=%s, room=%d]",
+                id, name, surname, roomNumber);
     }
 }

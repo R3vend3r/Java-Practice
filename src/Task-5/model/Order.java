@@ -1,27 +1,76 @@
 package model;
 
 import java.util.Date;
+import java.util.Objects;
 
-public abstract class Order{
-    private final int id;
-    private static int nextId = 0;
-    private final Client client;
-    private final Date creationDate;
-    private final Date availableDate;
+public abstract class Order {
+    private String id;
+    private Client client;
+    private Date creationDate;
+    private Date availableDate;
     private double totalPrice;
 
-    protected Order(Client client, Date creationDate, Date availableDate) {
-        this.id = nextId++;
-        this.client = client;
-        this.creationDate = creationDate;
-        this.availableDate = availableDate;
+    protected Order(String id, Client client, Date creationDate, Date availableDate) {
+        setId(id);
+        setClient(client);
+        setCreationDate(creationDate);
+        setAvailableDate(availableDate);
     }
 
-    public int getId() { return id; }
-    public Client getClient() { return client; }
-    public Date getCreationDate() { return creationDate; }
-    public Date getAvailableDate() { return availableDate; }
-    public double getTotalPrice() { return totalPrice; }
+    protected Order(Client client, Date creationDate, Date availableDate) {
+        this(generateId(), client, creationDate, availableDate);
+    }
 
-    protected void setTotalPrice(double price) { this.totalPrice = price; }
+    static String generateId() {
+        return "OR-" + System.currentTimeMillis();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = Objects.requireNonNull(id, "Order ID cannot be null");
+        if (id.isBlank()) {
+            throw new IllegalArgumentException("Order ID cannot be blank");
+        }
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = Objects.requireNonNull(client, "Client cannot be null");
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = Objects.requireNonNull(creationDate, "Creation date cannot be null");
+    }
+
+    public Date getAvailableDate() {
+        return availableDate;
+    }
+
+    public void setAvailableDate(Date availableDate) {
+        this.availableDate = Objects.requireNonNull(availableDate, "Available date cannot be null");
+        if (availableDate.before(creationDate)) {
+            throw new IllegalArgumentException("Available date cannot be before creation date");
+        }
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        if (totalPrice < 0) {
+            throw new IllegalArgumentException("Total price cannot be negative");
+        }
+        this.totalPrice = totalPrice;
+    }
 }

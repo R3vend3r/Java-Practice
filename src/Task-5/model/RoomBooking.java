@@ -1,38 +1,46 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class RoomBooking extends Order {
-    private final Room room;
+    private Room room;
     private Date checkOutDate;
-    private final double totalPrice;
     private final List<AmenityOrder> services;
 
-    public RoomBooking(Client client, Room room, double totalPrice,  Date checkOutDate) {
-        super(client, new Date(), checkOutDate);
-        this.room = room;
-        this.checkOutDate = checkOutDate;
+    public RoomBooking(String id, Client client, Room room, Date checkOutDate) {
+        super(id, client, new Date(), checkOutDate);
+        setRoom(room);
+        setCheckOutDate(checkOutDate);
         this.services = new ArrayList<>();
-        this.totalPrice = totalPrice;
     }
 
-    public Room getRoom() { return room; }
-    public Date getCheckOutDate() { return checkOutDate; }
-    public List<AmenityOrder> getServices() { return Collections.unmodifiableList(services); }
-
-    public void addService(AmenityOrder service) {
-        services.add(service);
-        setTotalPrice(getTotalPrice() + service.getAmenity().getPrice());
+    public RoomBooking(Client client, Room room, Date checkOutDate) {
+        this(generateId(), client, room, checkOutDate);
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
+    public Room getRoom() {
+        return room;
+    }
+
+    public void setRoom(Room room) {
+        this.room = Objects.requireNonNull(room, "Room cannot be null");
+    }
+
+    public Date getCheckOutDate() {
+        return checkOutDate;
     }
 
     public void setCheckOutDate(Date checkOutDate) {
-        this.checkOutDate = checkOutDate;
+        this.checkOutDate = Objects.requireNonNull(checkOutDate, "Check-out date cannot be null");
+        setAvailableDate(checkOutDate);
+    }
+
+    public List<AmenityOrder> getServices() {
+        return Collections.unmodifiableList(services);
+    }
+
+    public void addService(AmenityOrder service) {
+        services.add(Objects.requireNonNull(service));
+        setTotalPrice(getTotalPrice() + service.getAmenity().getPrice());
     }
 }

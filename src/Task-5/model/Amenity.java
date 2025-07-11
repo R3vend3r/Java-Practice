@@ -1,15 +1,35 @@
 package model;
 
-import interfaceClass.*;
 import java.util.Objects;
 
-public class Amenity{
+public class Amenity {
+    private String id;
     private String name;
     private double price;
 
-    public Amenity(String name, double price) {
+    public Amenity(String id, String name, double price) {
+        setId(id);
         setName(name);
         setPrice(price);
+    }
+
+    public Amenity(String name, double price) {
+        this(generateId(), name, price);
+    }
+
+    private static String generateId() {
+        return "AM-" + System.currentTimeMillis();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = Objects.requireNonNull(id, "Amenity ID cannot be null");
+        if (id.isBlank()) {
+            throw new IllegalArgumentException("Amenity ID cannot be blank");
+        }
     }
 
     public String getName() {
@@ -34,18 +54,21 @@ public class Amenity{
         this.price = price;
     }
 
+    @Override
     public String toString() {
-        return String.format("Amenity[name=%s, price=%.2f]", name, price);
+        return String.format("Amenity[id=%s, name=%s, price=%.2f]", id, name, price);
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Amenity amenity = (Amenity) o;
-        return name.equals(amenity.name);
+        return id.equals(amenity.id);
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(id);
     }
 }
