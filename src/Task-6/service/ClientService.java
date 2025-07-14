@@ -43,4 +43,7 @@ public class ClientService {
     public List<Client> getAllClients(){
         return clientRepository.getAllClients();
     }
+    public void clearAll() {
+        clientRepository.clearAll(); // Реализуем в каждом репозитории
+    }
 }

@@ -66,4 +66,8 @@ public class ClientRepository implements IClientRepository {
     public List<Client> getAllClients() {
         return Collections.unmodifiableList(clients);
     }
+    @Override
+    public void clearAll() {
+        clients.clear();
+    }
 }

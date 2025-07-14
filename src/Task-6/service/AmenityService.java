@@ -48,4 +48,7 @@ public class AmenityService {
     public Optional<Amenity> findAmenityByName(String name) {
         return amenityRepository.findAmenityByName(name);
     }
+    public void clearAll() {
+        amenityRepository.clearAll(); // Реализуем в каждом репозитории
+    }
 }

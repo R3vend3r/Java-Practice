@@ -2,16 +2,19 @@ package interfaceClass;
 
 import enums.RoomCondition;
 import enums.SortType;
+import model.Client;
 import model.Room;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface IRoomRepository {
     void addRoom(Room room);
     Optional<Room> findRoomByNumber(int number);
-
+    void addClientToRoomHistory(int roomNumber, Client client);
+    List<Client> getRoomHistory(int roomNumber);
     void markRoomOccupied(Room room);
     void clearRoom(int roomNumber);
     void changeRoomCondition(int number, RoomCondition newStatus);
@@ -32,4 +35,6 @@ public interface IRoomRepository {
     int countAvailableRooms();
     double calculateStayCost(int number, Date endDate);
     String getRoomDetails(int roomNumber);
+
+    void clearAll();
 }

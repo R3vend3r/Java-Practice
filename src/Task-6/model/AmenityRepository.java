@@ -85,4 +85,9 @@ public class AmenityRepository implements IAmenityRepository {
         Objects.requireNonNull(amenityName, "Amenity name cannot be null");
         amenities.removeIf(a -> a.getName().equalsIgnoreCase(amenityName));
     }
+
+    @Override
+    public void clearAll() {
+        amenities.clear();
+    }
 }

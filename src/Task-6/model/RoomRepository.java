@@ -1,5 +1,6 @@
 package model;
 
+import Utils.HotelConfig;
 import enums.RoomCondition;
 import enums.SortType;
 import interfaceClass.*;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 
 public class RoomRepository implements IRoomRepository {
     private final Map<Integer, Room> rooms = new HashMap<>();
+    private final Map<Integer, Queue<Client>> roomHistory = new HashMap<>();
 
     @Override
     public void addRoom(Room room) {
@@ -16,6 +18,22 @@ public class RoomRepository implements IRoomRepository {
             throw new IllegalArgumentException("Room " + room.getNumberRoom() + " already exists");
         }
         rooms.put(room.getNumberRoom(), room);
+    }
+
+    @Override
+    public void addClientToRoomHistory(int roomNumber, Client client) {
+        Objects.requireNonNull(client, "Client cannot be null");
+        Room room = rooms.get(roomNumber);
+        if (room == null) {
+            throw new IllegalArgumentException("Room " + roomNumber + " not found");
+        }
+
+        roomHistory.computeIfAbsent(roomNumber, k -> new LinkedList<>()).add(client);
+
+        Queue<Client> history = roomHistory.get(roomNumber);
+        while (history.size() > HotelConfig.getMaxHistoryEntries()) {
+            history.poll();
+        }
     }
 
     @Override
@@ -183,8 +201,18 @@ public class RoomRepository implements IRoomRepository {
     }
 
     @Override
+    public List<Client> getRoomHistory(int roomNumber) {
+        Queue<Client> history = roomHistory.get(roomNumber);
+        return history != null ? new ArrayList<>(history) : Collections.emptyList();
+    }
+
+    @Override
     public String getRoomDetails(int roomNumber) {
         Room room = rooms.get(roomNumber);
         return room != null ? room.toString() : "Room not found";
+    }
+    @Override
+    public void clearAll() {
+        rooms.clear();
     }
 }

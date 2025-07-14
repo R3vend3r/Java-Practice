@@ -1,14 +1,18 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
-public abstract class Order {
+public abstract class Order implements Serializable {
     private String id;
     private Client client;
     private Date creationDate;
     private Date availableDate;
     private double totalPrice;
+
+    public Order() {
+    }
 
     protected Order(String id, Client client, double totalPrice, Date creationDate, Date availableDate) {
         setId(id);
@@ -18,8 +22,8 @@ public abstract class Order {
         setTotalPrice(totalPrice);
     }
 
-    protected Order(Client client, double totalPrice, Date availableDate) {
-        this(generateId(), client, totalPrice, new Date(), availableDate);
+    protected Order(Client client, double totalPrice, Date createInDate, Date availableDate) {
+        this(generateId(), client, totalPrice, createInDate, availableDate);
     }
 
     static String generateId() {

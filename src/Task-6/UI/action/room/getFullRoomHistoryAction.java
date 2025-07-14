@@ -7,29 +7,27 @@ import model.Client;
 import java.util.List;
 import java.util.Scanner;
 
-public class getLastThreeRoomClientsAction implements Action {
+public class getFullRoomHistoryAction implements Action {
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
 
-    public getLastThreeRoomClientsAction(ManagerHotel manager) {
+    public getFullRoomHistoryAction(ManagerHotel manager) {
         this.manager = manager;
     }
 
     @Override
     public void execute() {
-        System.out.print("\nПоследние постояльцы номера\nВведите номер: ");
+        System.out.print("\nПолная история номера\nВведите номер комнаты: ");
         int roomNumber = scanner.nextInt();
         scanner.nextLine();
 
         List<Client> history = manager.getRoomHistory(roomNumber);
-        int limit = Math.min(history.size(), 3);
-
-        if (limit == 0) {
+        if (history.isEmpty()) {
             System.out.println("История для комнаты " + roomNumber + " пуста");
         } else {
-            System.out.println("Последние " + limit + " постояльца комнаты " + roomNumber + ":");
-            history.subList(0, limit).forEach(client ->
-                    System.out.println("- " + client.getName() + " " + client.getSurname())
+            System.out.println("Полная история комнаты " + roomNumber + ":");
+            history.forEach(client ->
+                    System.out.println("- " + client.getName() +" " + client.getSurname() + " (ID: " + client.getId() + ")")
             );
         }
     }

@@ -7,6 +7,9 @@ public class AmenityOrder extends Order {
     private Amenity amenity;
     private Date serviceDate;
 
+    public AmenityOrder() {
+    }
+
     public AmenityOrder(String id, Client client, double totalPrice, Amenity amenity, Date serviceDate) {
         super(id, client, totalPrice, new Date(), serviceDate);
         setAmenity(amenity);
@@ -15,7 +18,7 @@ public class AmenityOrder extends Order {
     }
 
     public AmenityOrder(Client client, Amenity amenity, Date serviceDate) {
-        super(client, amenity.getPrice(), serviceDate);
+        super(client, amenity.getPrice(), new Date(), serviceDate);
         setAmenity(amenity);
         setServiceDate(serviceDate);
     }

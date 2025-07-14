@@ -3,12 +3,10 @@ package service;
 import enums.RoomCondition;
 import enums.SortType;
 import interfaceClass.*;
+import model.Client;
 import model.Room;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class RoomService {
     private final IRoomRepository roomRepository;
@@ -19,6 +17,10 @@ public class RoomService {
 
     public void addRoom(Room room) {
         roomRepository.addRoom(room);
+    }
+
+    public void addClientToRoomHistory(int roomNumber, Client client) {
+        roomRepository.addClientToRoomHistory(roomNumber, client);
     }
 
     public Optional<Room> findRoom(int roomNumber) {
@@ -84,8 +86,15 @@ public class RoomService {
         Objects.requireNonNull(endDate, "End date cannot be null");
         return roomRepository.calculateStayCost(roomNumber, endDate);
     }
+    public List<Client> getRoomHistory(int roomNumber) {
+        return roomRepository.getRoomHistory(roomNumber);
+    }
 
     public String getRoomDetails(int roomNumber) {
         return roomRepository.getRoomDetails(roomNumber);
+    }
+
+    public void clearAll() {
+        roomRepository.clearAll();
     }
 }

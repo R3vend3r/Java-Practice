@@ -62,4 +62,10 @@ public interface ActionFactory {
     public Action importBookingsCsvAction();
     public Action exportAmenityOrdersCsvAction();
     public Action importAmenityOrdersCsvAction();
+
+    Action getFullRoomHistoryAction();
+
+    Action saveStateAction();
+
+    Action loadStateAction();
 }

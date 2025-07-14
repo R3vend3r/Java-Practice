@@ -24,4 +24,6 @@ public interface IOrderRepository {
     List<AmenityOrder> getSortedAmenityOrders(SortType sortType);
     List<RoomBooking> getLastThreeBookingsForRoom(int roomNumber);
     Optional<RoomBooking> findActiveBookingByRoom(int roomNumber);
+
+    void clearAll();
 }

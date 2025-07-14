@@ -32,7 +32,7 @@ public class OrderRepository implements IOrderRepository {
         }
         double price = room.getPriceForDay();
         double totalPrice = calculateStayCost(price, checkInDate, checkOutDate);
-        RoomBooking booking = new RoomBooking(client, room, totalPrice, checkOutDate);
+        RoomBooking booking = new RoomBooking(client, room, totalPrice, checkInDate, checkOutDate);
         activeBookings.add(booking);
         completedBookings.add(booking);
     }
@@ -156,5 +156,11 @@ public class OrderRepository implements IOrderRepository {
         return activeBookings.stream()
                 .filter(booking -> booking.getRoom().getNumberRoom() == roomNumber)
                 .findFirst();
+    }
+    @Override
+    public void clearAll() {
+        amenityOrders.clear();
+        completedBookings.clear();
+        activeBookings.clear();
     }
 }

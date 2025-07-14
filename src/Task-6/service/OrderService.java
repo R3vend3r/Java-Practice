@@ -55,7 +55,9 @@ public class OrderService {
     public List<RoomBooking> getLastThreeBookingsForRoom(int roomNumber) {
         return orderRepository.getLastThreeBookingsForRoom(roomNumber);
     }
-
+    public void clearAll() {
+        orderRepository.clearAll(); // Реализуем в каждом репозитории
+    }
 //    public Optional<IRoomBooking> findActiveBookingByRoom(int roomNumber) {
 //        return orderRepository.findActiveBookingByRoom(roomNumber);
 //    }

@@ -1,11 +1,15 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Amenity {
+public class Amenity implements Serializable {
     private String id;
     private String name;
     private double price;
+
+    public Amenity() {
+    }
 
     public Amenity(String id, String name, double price) {
         setId(id);

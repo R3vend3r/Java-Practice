@@ -252,4 +252,19 @@ public class ActionFactoryController implements ActionFactory {
     public Action importAmenityOrdersCsvAction() {
         return new importAmenityOrdersCsvAction(actionFactoryController);
     }
+
+    @Override
+    public Action getFullRoomHistoryAction() {
+        return new getFullRoomHistoryAction(actionFactoryController);
+    }
+
+    @Override
+    public Action saveStateAction() {
+        return new saveStateAction(actionFactoryController);
+    }
+
+    @Override
+    public Action loadStateAction() {
+        return new loadStateAction(actionFactoryController);
+    }
 }

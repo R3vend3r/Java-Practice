@@ -118,6 +118,7 @@ public class Builder implements Action {
 
         Menu bookingHistoryMenu = new Menu("История бронирований");
         bookingHistoryMenu.addMenuItem(new MenuItem("Последние 3 постояльца", actionFactory.getLastThreeRoomClientsAction(), null));
+        bookingHistoryMenu.addMenuItem(new MenuItem("Полная история номера", actionFactory.getFullRoomHistoryAction(), null));
         bookingHistoryMenu.addMenuItem(new MenuItem("Все завершенные бронирования", actionFactory.getAllCompletedBookingsAction(), null));
 
         reportsMenu.addMenuItem(new MenuItem("История бронирований", null, bookingHistoryMenu));
@@ -132,6 +133,9 @@ public class Builder implements Action {
         operationsMenu.addMenuItem(new MenuItem("Найти свободные номера к дате", actionFactory.getAvailableRoomsByDateAction(), null));
         operationsMenu.addMenuItem(new MenuItem("Проверить доступность номера", actionFactory.checkRoomAvailabilityAction(), null));
         operationsMenu.addMenuItem(new MenuItem("Добавить услугу клиенту", actionFactory.addAmenityToClientAction(), null));
+
+        operationsMenu.addMenuItem(new MenuItem("Сохранить состояние", actionFactory.saveStateAction(), null));
+        operationsMenu.addMenuItem(new MenuItem("Загрузить состояние", actionFactory.loadStateAction(), null));
 
         return operationsMenu;
     }

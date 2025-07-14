@@ -1,14 +1,21 @@
 package model;
 
+import Utils.HotelConfig;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import enums.RoomCondition;
 import enums.RoomType;
 
-import java.util.Date;
-import java.util.Objects;
 
-public class Room{
+import java.io.Serializable;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.Queue;
+
+public class Room implements Serializable {
     private String id;
     private int numberRoom;
+    @JsonProperty("available")
     private boolean isAvailable;
     private RoomCondition roomCondition;
     private RoomType type;
@@ -17,6 +24,11 @@ public class Room{
     private int capacity;
     private int stars;
     private String clientId;
+    private Queue<Client> clientHistory = new LinkedList<>();
+    private static final HotelConfig config = new HotelConfig();
+
+    public Room() {
+    }
 
     public Room(String id, int number, RoomType type, double priceForDay, int capacity,
                 RoomCondition condition, int stars) {
@@ -33,6 +45,15 @@ public class Room{
     public Room(int number, RoomType type, double priceForDay, int capacity) {
         this(generateId(), number, type, priceForDay, capacity,
                 RoomCondition.READY, 3);
+    }
+
+    public void addClientToHistory(Client client) {
+        Objects.requireNonNull(client, "Client cannot be null");
+        clientHistory.add(client);
+        // Ограничиваем размер истории согласно конфигурации
+        while (clientHistory.size() > HotelConfig.getMaxHistoryEntries()) {
+            clientHistory.poll();
+        }
     }
 
     private static String generateId() {
@@ -102,6 +123,9 @@ public class Room{
     }
 
     public void setRoomCondition(RoomCondition status) {
+        if (!config.isRoomStatusChangeEnabled()) {
+            throw new IllegalStateException("Изменение статуса комнаты отключено в настройках");
+        }
         this.roomCondition = Objects.requireNonNull(status);
     }
 
@@ -139,6 +163,10 @@ public class Room{
             throw new IllegalArgumentException("Stars must be between 1 and 5");
         }
         this.stars = stars;
+    }
+
+    public Queue<Client> getClientHistory() {
+        return new LinkedList<>(clientHistory);
     }
 
     @Override

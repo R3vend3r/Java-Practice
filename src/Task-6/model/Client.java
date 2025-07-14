@@ -1,13 +1,17 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Client {
+public class Client implements Serializable {
     private String id;
     private String name;
     private String surname;
     private int roomNumber;
+
+    public Client() {
+    }
 
     public Client(String id, String name, String surname, int roomNumber) {
         setId(id);

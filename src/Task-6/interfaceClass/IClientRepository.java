@@ -14,4 +14,6 @@ public interface IClientRepository {
     void assignRoomToClient(String clientId, int roomNumber);
     int getClientCount();
     List<Client> getAllClients();
+
+    void clearAll();
 }

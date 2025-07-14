@@ -13,4 +13,6 @@ public interface IAmenityRepository {
     Optional<Amenity> findAmenityByName(String name);
     void updateAmenity(Amenity amenity);
     void deleteAmenity(String amenityName);
+
+    void clearAll();
 }

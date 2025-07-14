@@ -1,10 +1,14 @@
 package Controller;
 
+import Utils.HotelConfig;
+import Utils.*;
 import csv.*;
 import Exception.*;
 import enums.RoomCondition;
 import enums.SortType;
 import interfaceClass.*;
+
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,8 +16,7 @@ import model.*;
 import service.*;
 
 public class ManagerHotel {
-//    private String nameHotel;
-private static final ManagerHotel INSTANCE = new ManagerHotel();
+    private static final ManagerHotel INSTANCE = new ManagerHotel();
     private final RoomService roomService;
     private final AmenityService amenityService;
     private final ClientService clientService;
@@ -23,7 +26,7 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
     private final ICsvService<Client> clientCsvService;
     private final ICsvService<RoomBooking> roomBookingCsvService;
     private final ICsvService<AmenityOrder> amenityOrderCsvService;
-
+    private Map<Integer, Queue<Client>> roomHistory = new HashMap<>();
 
     private ManagerHotel() {
         IRoomRepository roomRepository = new RoomRepository();
@@ -40,25 +43,22 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
         this.clientCsvService = new ClientCsvService();
         this.roomBookingCsvService = new RoomBookingCsvService();
         this.amenityOrderCsvService = new AmenityOrderCsvService();
+
+
+        loadInitialState();
+
+        if (HotelConfig.isAutoSaveEnabled()) {
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                saveStateToJson(HotelConfig.getDatabaseFilePath());
+                System.out.println("Автосохранение выполнено");
+            }));
+        }
     }
 
     public static ManagerHotel getInstance() {
         return INSTANCE;
     }
 
-//    public ManagerHotel(String nameHotel) {
-//        this.nameHotel = Objects.requireNonNull(nameHotel, "Hotel name cannot be null");
-//
-//        IRoomRepository roomRepository = new RoomRepository();
-//        IAmenityRepository amenityRepository = new AmenityRepository();
-//        IClientRepository clientRepository = new ClientRepository();
-//        IOrderRepository orderRepository = new OrderRepository();
-//
-//        this.roomService = new RoomService(roomRepository);
-//        this.amenityService = new AmenityService(amenityRepository);
-//        this.clientService = new ClientService(clientRepository);
-//        this.orderService = new OrderService(orderRepository);
-//    }
 
     public void settleClient(Client client, Room room, Date checkOutDate) {
         Objects.requireNonNull(client, "Client cannot be null");
@@ -70,10 +70,19 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
                 .orElse(false)) {
             throw new IllegalStateException("Room " + room.getNumberRoom() + " is not available");
         }
+
         orderService.createRoomBooking(client, room, new Date(), checkOutDate);
         roomService.assignClientToRoom(room.getNumberRoom(), client.getId(), checkOutDate);
         roomService.markRoomOccupied(room);
         clientService.assignRoomToClient(client.getId(), room.getNumberRoom());
+
+        // Добавляем клиента в историю комнаты
+        roomHistory.computeIfAbsent(room.getNumberRoom(), k -> new LinkedList<>()).add(client);
+        // Ограничиваем размер истории согласно конфигурации
+        Queue<Client> history = roomHistory.get(room.getNumberRoom());
+        while (history != null && history.size() > HotelConfig.getMaxHistoryEntries()) {
+            history.poll();
+        }
     }
 
     public void evictClient(int roomNumber) {
@@ -111,7 +120,11 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
     }
 
     public void updateRoomStatus(int number, RoomCondition status) {
-        roomService.updateRoomStatus(number, status);
+        if (HotelConfig.isRoomStatusChangeEnabled()) {
+            roomService.updateRoomStatus(number, status);
+        } else {
+            System.out.println("Изменение статуса комнаты запрещено конфигурацией.");
+        }
     }
 
     public void updateRoomPrice(int number, double newPrice) {
@@ -126,6 +139,11 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
         return onlyAvailable
                 ? roomService.getSortedAvailableRooms(sortType)
                 : roomService.getSortedRooms(sortType);
+    }
+
+    public List<Client> getRoomHistory(int roomNumber) {
+        Queue<Client> history = roomHistory.get(roomNumber);
+        return history != null ? new ArrayList<>(history) : Collections.emptyList();
     }
 
     public List<RoomBooking> getAllActiveBookings(SortType sortType) {
@@ -188,7 +206,6 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
     public List<Client> getAllClients() {
         return clientService.getAllClients();
     }
-
 
     public int getClientCount(){
         return clientService.getClientCount();
@@ -298,8 +315,52 @@ private static final ManagerHotel INSTANCE = new ManagerHotel();
         }
         return importedOrders;
     }
+    public void saveStateToJson(String filePath) {
+        HotelState state = new HotelState(
+                roomService.getSortedRooms(SortType.NONE),
+                clientService.getAllClients(),
+                amenityService.getAllAmenities(),
+                orderService.getActiveBookingsSorted(SortType.NONE),
+                orderService.getCompletedBookings(),
+                orderService.getAmenityOrdersSorted(SortType.NONE),
+                roomHistory
+        );
+        HotelJsonUtil.saveState(state, filePath);
+    }
 
-//    public String getNameHotel() {
-//        return nameHotel;
-//    }
+    private void loadInitialState() {
+        try {
+            loadStateFromJson(HotelConfig.getDatabaseFilePath());
+        } catch (Exception e) {
+            System.err.println("⛔ CRITICAL ERROR при загрузке состояния:");
+            e.printStackTrace();
+            System.out.println("Файл: " + new File(HotelConfig.getDatabaseFilePath()).getAbsolutePath());
+        }
+    }
+
+    public void loadStateFromJson(String filePath) {
+        HotelState state = HotelJsonUtil.loadState(filePath);
+        if (state == null) return;
+
+        roomService.clearAll();
+        clientService.clearAll();
+        amenityService.clearAll();
+        orderService.clearAll();
+        roomHistory.clear();
+
+        state.getRooms().values().forEach(roomService::addRoom);
+        state.getClients().forEach(clientService::registerClient);
+        state.getAmenities().forEach(amenityService::addAmenity);
+        state.getActiveBookings().forEach(booking ->
+                orderService.createRoomBooking(booking.getClient(), booking.getRoom(), booking.getCheckInDate(), booking.getCheckOutDate())
+        );
+        state.getAmenityOrders().forEach(order ->
+                orderService.addAmenityToBooking(
+                        order.getClient().getRoomNumber(),
+                        order.getAmenity(),
+                        order.getServiceDate()
+                ));
+        roomHistory.putAll(state.getRoomHistory());
+    }
+
 }
