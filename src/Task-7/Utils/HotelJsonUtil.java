@@ -18,7 +18,7 @@ public class HotelJsonUtil {
     public static HotelState loadState(String filePath) {
         try {
             File file = new File(filePath);
-            System.out.println("Путь к файлу: " + file.getAbsolutePath()); // Логируем путь
+            System.out.println("Путь к файлу: " + file.getAbsolutePath());
             if (file.exists()) {
                 System.out.println("Файл найден, пробуем загрузить...");
                 return mapper.readValue(file, HotelState.class);

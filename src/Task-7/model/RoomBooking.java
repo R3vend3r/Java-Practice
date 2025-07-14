@@ -21,7 +21,7 @@ public class RoomBooking extends Order {
         this.services = new ArrayList<>();
     }
 
-    public RoomBooking(Client client, Room room, double totalPrice, Date checkOutDate, Date checkInDate) {
+    public RoomBooking(Client client, Room room, double totalPrice, Date checkInDate, Date checkOutDate) {
         super(client, totalPrice,checkInDate, checkOutDate);
         setRoom(room);
         setCheckOutDate(checkOutDate);

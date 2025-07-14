@@ -32,7 +32,7 @@ public class OrderRepository implements IOrderRepository {
         }
         double price = room.getPriceForDay();
         double totalPrice = calculateStayCost(price, checkInDate, checkOutDate);
-        RoomBooking booking = new RoomBooking(client, room, totalPrice, checkInDate, checkOutDate);
+        RoomBooking booking = new RoomBooking(client, room, totalPrice, new Date(), checkOutDate);
         activeBookings.add(booking);
         completedBookings.add(booking);
     }

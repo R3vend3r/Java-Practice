@@ -332,7 +332,7 @@ public class ManagerHotel {
         try {
             loadStateFromJson(HotelConfig.getDatabaseFilePath());
         } catch (Exception e) {
-            System.err.println("⛔ CRITICAL ERROR при загрузке состояния:");
+            System.err.println("CRITICAL ERROR при загрузке состояния:");
             e.printStackTrace();
             System.out.println("Файл: " + new File(HotelConfig.getDatabaseFilePath()).getAbsolutePath());
         }
