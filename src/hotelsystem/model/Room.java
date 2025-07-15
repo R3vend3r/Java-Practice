@@ -2,6 +2,8 @@ package hotelsystem.model;
 
 import hotelsystem.Utils.HotelConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import hotelsystem.dependencies.annotation.ConfigProperty;
+import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.enums.RoomCondition;
 import hotelsystem.enums.RoomType;
 import lombok.Getter;
@@ -39,8 +41,11 @@ public class Room implements Serializable {
     @Setter
     @Getter
     private String clientId;
+    @ConfigProperty(propertyName = "hotel.room.history.max_entries")
+    private int maxHistoryEntries;
     private final Queue<Client> clientHistory = new LinkedList<>();
-
+    @Inject
+    private HotelConfig hotelConfig;
     public Room() {
     }
 
@@ -64,8 +69,11 @@ public class Room implements Serializable {
     public void addClientToHistory(Client client) {
         Objects.requireNonNull(client, "Client cannot be null");
         clientHistory.add(client);
-        // Ограничиваем размер истории согласно конфигурации
-        while (clientHistory.size() > HotelConfig.getMaxHistoryEntries()) {
+        trimHistory();
+    }
+
+    private void trimHistory() {
+        while (clientHistory.size() > maxHistoryEntries) {
             clientHistory.poll();
         }
     }
@@ -105,7 +113,7 @@ public class Room implements Serializable {
     }
 
     public void setRoomCondition(RoomCondition status) {
-        if (!HotelConfig.isRoomStatusChangeEnabled()) {
+        if (hotelConfig != null && !hotelConfig.isRoomStatusChangeEnabled()) {
             throw new IllegalStateException("Изменение статуса комнаты отключено в настройках");
         }
         this.roomCondition = Objects.requireNonNull(status);

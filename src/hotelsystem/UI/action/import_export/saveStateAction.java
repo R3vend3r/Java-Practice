@@ -3,6 +3,7 @@ package hotelsystem.UI.action.import_export;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 import hotelsystem.Utils.HotelConfig;
+import hotelsystem.dependencies.annotation.Inject;
 
 import java.util.Scanner;
 
@@ -10,6 +11,8 @@ public class saveStateAction implements Action {
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
 
+    @Inject
+    private HotelConfig hotelConfig;
     public saveStateAction(ManagerHotel manager) {
         this.manager = manager;
     }
@@ -20,7 +23,7 @@ public class saveStateAction implements Action {
         String filePath = scanner.nextLine().trim();
 
         if (filePath.isEmpty()) {
-            filePath = HotelConfig.getDatabaseFilePath();
+            filePath = hotelConfig.getDatabaseFilePath();
         }
 
         try {

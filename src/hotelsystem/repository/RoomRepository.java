@@ -3,6 +3,7 @@ package hotelsystem.repository;
 import hotelsystem.Utils.HotelConfig;
 import hotelsystem.dependencies.annotation.Component;
 
+import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.enums.RoomCondition;
 import hotelsystem.enums.SortType;
 import hotelsystem.interfaceClass.*;
@@ -17,7 +18,8 @@ public class RoomRepository implements IRoomRepository {
 
     private final Map<Integer, Room> rooms;
     private final Map<Integer, Queue<Client>> roomHistory;
-
+    @Inject
+    private HotelConfig hotelConfig;
     public RoomRepository() {
         this.rooms = new HashMap<>();
         this.roomHistory = new HashMap<>();
@@ -43,7 +45,7 @@ public class RoomRepository implements IRoomRepository {
         roomHistory.computeIfAbsent(roomNumber, k -> new LinkedList<>()).add(client);
 
         Queue<Client> history = roomHistory.get(roomNumber);
-        while (history.size() > HotelConfig.getMaxHistoryEntries()) {
+        while (history.size() > hotelConfig.getMaxHistoryEntries()) {
             history.poll();
         }
     }

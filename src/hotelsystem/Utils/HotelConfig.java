@@ -1,71 +1,75 @@
 package hotelsystem.Utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import hotelsystem.dependencies.annotation.ConfigProperty;
 import java.util.Properties;
 
 public class HotelConfig {
-    private static final String PROPERTIES_FILE = "hotel.properties";
-    private static final Properties properties = new Properties();
 
-    private static final boolean DEFAULT_ROOM_STATUS_CHANGE = true;
-    private static final int DEFAULT_MAX_HISTORY_ENTRIES = 3;
-    private static final String DEFAULT_DB_FILE = "hotel_db.json";
+    @ConfigProperty(propertyName = "hotel.room.status.change.enabled")
+    private boolean roomStatusChangeEnabled = true;
 
-    static {
+    @ConfigProperty(propertyName = "hotel.room.history.entries.max")
+    private int maxHistoryEntries = 3;
+
+    @ConfigProperty(propertyName = "hotel.database.file")
+    private String databaseFilePath = "hotel_db.json";
+
+    @ConfigProperty(propertyName = "hotel.auto.save.enabled")
+    private boolean autoSaveEnabled = true;
+
+    private static HotelConfig instance;
+    private Properties properties;
+
+    private HotelConfig() {
+    }
+
+    public static synchronized HotelConfig getInstance() {
+        if (instance == null) {
+            instance = new HotelConfig();
+            instance.loadProperties();
+        }
+        return instance;
+    }
+
+    private void loadProperties() {
+        properties = new Properties();
         try {
-            File configFile = new File(PROPERTIES_FILE);
-            if (configFile.exists()) {
-                try (InputStream input = new FileInputStream(configFile)) {
+            // Попробуем загрузить из файла в рабочей директории
+            String externalConfig = System.getProperty("hotel.config.file", "hotel.properties");
+            java.nio.file.Path path = java.nio.file.Paths.get(externalConfig);
+
+            if (java.nio.file.Files.exists(path)) {
+                try (java.io.InputStream input = java.nio.file.Files.newInputStream(path)) {
                     properties.load(input);
                 }
             } else {
-                try (InputStream input = HotelConfig.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE)) {
+                // Загружаем из ресурсов
+                try (java.io.InputStream input = getClass().getClassLoader()
+                        .getResourceAsStream("hotel.properties")) {
                     if (input != null) {
                         properties.load(input);
-                    } else {
-                        System.out.println("⚠ Конфигурационный файл не найден. Используются значения по умолчанию.");
                     }
                 }
             }
-        } catch (IOException e) {
-            System.out.println("⚠ Ошибка чтения конфигурации. Используются значения по умолчанию.");
+        } catch (java.io.IOException e) {
+            System.out.println("⚠ Ошибка загрузки конфигурации: " + e.getMessage());
         }
     }
 
-    public static boolean isRoomStatusChangeEnabled() {
-        return Boolean.parseBoolean(properties.getProperty(
-                "hotel.room.status.change.enabled",
-                String.valueOf(DEFAULT_ROOM_STATUS_CHANGE)));
+    // Геттеры
+    public boolean isRoomStatusChangeEnabled() {
+        return roomStatusChangeEnabled;
     }
 
-    public static int getMaxHistoryEntries() {
-        try {
-            return Integer.parseInt(properties.getProperty(
-                    "hotel.room.history.entries.max",
-                    String.valueOf(DEFAULT_MAX_HISTORY_ENTRIES)));
-        } catch (NumberFormatException e) {
-            System.out.println("⚠ Некорректное значение history entries. Используется значение по умолчанию.");
-            return DEFAULT_MAX_HISTORY_ENTRIES;
-        }
+    public int getMaxHistoryEntries() {
+        return maxHistoryEntries;
     }
 
-    public static String getDatabaseFilePath() {
-        String path = properties.getProperty("hotel.database.file", DEFAULT_DB_FILE);
-
-            File file = new File(path);
-            if (file.exists()) {
-                return path;
-            }
-
-        return DEFAULT_DB_FILE;
+    public String getDatabaseFilePath() {
+        return databaseFilePath;
     }
 
-    public static boolean isAutoSaveEnabled() {
-        return Boolean.parseBoolean(properties.getProperty(
-                "hotel.auto.save.enabled",
-                "true"));
+    public boolean isAutoSaveEnabled() {
+        return autoSaveEnabled;
     }
 }

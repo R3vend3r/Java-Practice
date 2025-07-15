@@ -4,6 +4,7 @@ import hotelsystem.Utils.HotelConfig;
 import hotelsystem.Utils.*;
 import hotelsystem.csv.*;
 import hotelsystem.Exception.*;
+import hotelsystem.dependencies.annotation.ConfigProperty;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.dependencies.annotation.PostConstruct;
 import hotelsystem.dependencies.annotation.Variant;
@@ -43,6 +44,10 @@ public class ManagerHotel {
     private ICsvService<AmenityOrder> amenityOrderCsvService;
     @Inject
     private HotelConfig hotelConfig;
+
+    @ConfigProperty(propertyName = "hotel.room.history.max_entries")
+    private int maxHistoryEntries;
+
     private Map<Integer, Queue<Client>> roomHistory = new HashMap<>();
 
 
@@ -67,12 +72,17 @@ public class ManagerHotel {
         roomService.markRoomOccupied(room);
         clientService.assignRoomToClient(client.getId(), room.getNumberRoom());
 
-        // Добавляем клиента в историю комнаты
+        // Добавляем клиента в историю комнаты с учетом максимального размера из конфига
         roomHistory.computeIfAbsent(room.getNumberRoom(), k -> new LinkedList<>()).add(client);
-        // Ограничиваем размер истории согласно конфигурации
-        Queue<Client> history = roomHistory.get(room.getNumberRoom());
-        while (history != null && history.size() > HotelConfig.getMaxHistoryEntries()) {
-            history.poll();
+        trimHistory(room.getNumberRoom());
+    }
+
+    private void trimHistory(int roomNumber) {
+        Queue<Client> history = roomHistory.get(roomNumber);
+        if (history != null) {
+            while (history.size() > maxHistoryEntries) {
+                history.poll();
+            }
         }
     }
 
@@ -111,10 +121,10 @@ public class ManagerHotel {
     }
 
     public void updateRoomStatus(int number, RoomCondition status) {
-        if (HotelConfig.isRoomStatusChangeEnabled()) {
+        if (hotelConfig.isRoomStatusChangeEnabled()) {
             roomService.updateRoomStatus(number, status);
         } else {
-            System.out.println("Изменение статуса комнаты запрещено конфигурацией.");
+            throw new IllegalStateException("Изменение статуса комнаты запрещено конфигурацией");
         }
     }
 
