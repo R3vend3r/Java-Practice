@@ -39,17 +39,13 @@ public class BeanFactory {
             return (T) appContext.getBeanMap().get(implementationClass);
         }
 
-        // Создаем экземпляр с обработкой приватных конструкторов
         T bean = createInstance(implementationClass);
         appContext.getBeanMap().put(implementationClass, bean);
 
-        // Внедряем зависимости
         injectDependencies(bean);
 
-        // Обрабатываем конфигурационные свойства
         processConfigProperties(bean);
 
-        // Вызываем PostConstruct
         invokePostConstruct(bean);
 
         return bean;
@@ -58,7 +54,6 @@ public class BeanFactory {
     @SneakyThrows
     private <T> T createInstance(Class<T> clazz) {
         try {
-            // Пробуем получить конструктор по умолчанию
             Constructor<T> constructor = clazz.getDeclaredConstructor();
             constructor.setAccessible(true); // Разрешаем доступ к приватному конструктору
             return constructor.newInstance();
@@ -98,16 +93,16 @@ public class BeanFactory {
 
     private <T> void processConfigProperties(T bean) throws Exception {
         for (Field field : getConfigPropertyFields(bean.getClass())) {
-            field.setAccessible(true); // Разрешаем доступ к приватным полям
-
             ConfigProperty annotation = field.getAnnotation(ConfigProperty.class);
-            String propertyName = annotation.propertyName().isEmpty()
+            String configFile = annotation.configFileName();
+            String propertyKey = annotation.propertyName().isEmpty()
                     ? bean.getClass().getSimpleName() + "." + field.getName()
                     : annotation.propertyName();
 
-            String value = configLoader.getProperty(propertyName);
+            String value = configLoader.getProperty(configFile, propertyKey);
             if (value != null) {
                 Object convertedValue = convertValue(value, field.getType(), annotation.type());
+                field.setAccessible(true);
                 field.set(bean, convertedValue);
             }
         }
@@ -122,17 +117,73 @@ public class BeanFactory {
     private Object convertValue(String value, Class<?> fieldType, Class<?> targetType) {
         Class<?> conversionType = targetType != String.class ? targetType : fieldType;
 
-        if (conversionType == String.class) return value;
-        if (conversionType == Integer.class || conversionType == int.class)
-            return Integer.parseInt(value);
-        if (conversionType == Boolean.class || conversionType == boolean.class)
-            return Boolean.parseBoolean(value);
-        if (conversionType == Double.class || conversionType == double.class)
-            return Double.parseDouble(value);
-        if (conversionType == Long.class || conversionType == long.class)
-            return Long.parseLong(value);
+        if (conversionType.isArray()) {
+            return convertArray(value, conversionType.getComponentType());
+        }
+        if (Collection.class.isAssignableFrom(conversionType)) {
+            return convertCollection(value, resolveCollectionType(fieldType), resolveGenericType(fieldType));
+        }
 
-        throw new IllegalArgumentException("Unsupported type: " + conversionType);
+        if (conversionType.isEnum()) {
+            return Enum.valueOf((Class<? extends Enum>) conversionType, value);
+        }
+
+        return convertSingleValue(value, conversionType);
+    }
+
+    private Object convertArray(String value, Class<?> elementType) {
+        String[] parts = value.split(";");
+        Object array = Array.newInstance(elementType, parts.length);
+        for (int i = 0; i < parts.length; i++) {
+            Array.set(array, i, convertSingleValue(parts[i].trim(), elementType));
+        }
+        return array;
+    }
+
+    private Collection<?> convertCollection(String value, Class<?> collectionType, Class<?> elementType) {
+        String[] parts = value.split(";");
+        Collection<Object> collection = createCollectionInstance(collectionType);
+
+        for (String part : parts) {
+            collection.add(convertSingleValue(part.trim(), elementType));
+        }
+
+        return collection;
+    }
+
+    private Collection<Object> createCollectionInstance(Class<?> collectionType) {
+        if (List.class.isAssignableFrom(collectionType)) {
+            return new ArrayList<>();
+        }
+        if (Set.class.isAssignableFrom(collectionType)) {
+            return new HashSet<>();
+        }
+        return new ArrayList<>();
+    }
+
+    private Class<?> resolveCollectionType(Class<?> fieldType) {
+        if (List.class.isAssignableFrom(fieldType)) return List.class;
+        if (Set.class.isAssignableFrom(fieldType)) return Set.class;
+        return Collection.class; // default
+    }
+
+    private Class<?> resolveGenericType(Class<?> fieldType) {
+        return String.class;
+    }
+
+    private Object convertSingleValue(String value, Class<?> type) {
+        if (type == String.class) return value;
+        if (type == Integer.class || type == int.class) return Integer.parseInt(value);
+        if (type == Boolean.class || type == boolean.class) return Boolean.parseBoolean(value);
+        if (type == Double.class || type == double.class) return Double.parseDouble(value);
+        if (type == Long.class || type == long.class) return Long.parseLong(value);
+        if (type == Float.class || type == float.class) return Float.parseFloat(value);
+        if (type == Short.class || type == short.class) return Short.parseShort(value);
+        if (type == Byte.class || type == byte.class) return Byte.parseByte(value);
+        if (type == Character.class || type == char.class) return value.charAt(0);
+
+        // Для кастомных объектов можно добавить десериализацию из JSON или другого формата
+        throw new IllegalArgumentException("Unsupported type: " + type.getName());
     }
 
     @SneakyThrows

@@ -34,7 +34,6 @@ public class HotelConfig {
     private void loadProperties() {
         properties = new Properties();
         try {
-            // Попробуем загрузить из файла в рабочей директории
             String externalConfig = System.getProperty("hotel.config.file", "hotel.properties");
             java.nio.file.Path path = java.nio.file.Paths.get(externalConfig);
 
@@ -43,7 +42,6 @@ public class HotelConfig {
                     properties.load(input);
                 }
             } else {
-                // Загружаем из ресурсов
                 try (java.io.InputStream input = getClass().getClassLoader()
                         .getResourceAsStream("hotel.properties")) {
                     if (input != null) {
@@ -56,7 +54,6 @@ public class HotelConfig {
         }
     }
 
-    // Геттеры
     public boolean isRoomStatusChangeEnabled() {
         return roomStatusChangeEnabled;
     }
