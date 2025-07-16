@@ -55,7 +55,7 @@ public class BeanFactory {
     private <T> T createInstance(Class<T> clazz) {
         try {
             Constructor<T> constructor = clazz.getDeclaredConstructor();
-            constructor.setAccessible(true); // Разрешаем доступ к приватному конструктору
+            constructor.setAccessible(true);
             return constructor.newInstance();
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("No default constructor found for " + clazz.getName(), e);
@@ -64,7 +64,7 @@ public class BeanFactory {
 
     private <T> void injectDependencies(T bean) throws Exception {
         for (Field field : getInjectableFields(bean.getClass())) {
-            field.setAccessible(true); // Разрешаем доступ к приватным полям
+            field.setAccessible(true);
 
             Object dependency = resolveDependency(field);
             field.set(bean, dependency);
@@ -164,7 +164,7 @@ public class BeanFactory {
     private Class<?> resolveCollectionType(Class<?> fieldType) {
         if (List.class.isAssignableFrom(fieldType)) return List.class;
         if (Set.class.isAssignableFrom(fieldType)) return Set.class;
-        return Collection.class; // default
+        return Collection.class;
     }
 
     private Class<?> resolveGenericType(Class<?> fieldType) {
@@ -182,7 +182,6 @@ public class BeanFactory {
         if (type == Byte.class || type == byte.class) return Byte.parseByte(value);
         if (type == Character.class || type == char.class) return value.charAt(0);
 
-        // Для кастомных объектов можно добавить десериализацию из JSON или другого формата
         throw new IllegalArgumentException("Unsupported type: " + type.getName());
     }
 
