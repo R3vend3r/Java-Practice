@@ -13,7 +13,6 @@ public class Menu {
     public Menu(String name) {
         this.name = name;
         this.menuItems = new ArrayList<>();
-        logger.debug("Создано меню: {}", name);
     }
 
     public String getName() {
@@ -25,7 +24,6 @@ public class Menu {
     }
 
     public void addMenuItem(MenuItem menuItem) {
-        logger.debug("Добавлен пункт '{}' в меню '{}'", menuItem.getTitle(), name);
         this.menuItems.add(menuItem);
     }
 }

@@ -21,7 +21,7 @@ import hotelsystem.model.*;
 import hotelsystem.service.*;
 
 public class ManagerHotel {
-    // Инъекции сервисов и компонентов
+
     @Inject private RoomService roomService;
     @Inject private AmenityService amenityService;
     @Inject private ClientService clientService;

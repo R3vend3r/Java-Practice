@@ -1,7 +1,7 @@
 package hotelsystem.Utils;
 
 
-import org.apache.log4j.PropertyConfigurator;
+//import org.apache.log4j.PropertyConfigurator;
 import hotelsystem.dependencies.context.AppContext;
 import hotelsystem.dependencies.factory.BeanFactory;
 import hotelsystem.model.Client;

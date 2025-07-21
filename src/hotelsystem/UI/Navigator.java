@@ -19,7 +19,9 @@ public class Navigator {
 
     @Inject
     public Navigator(Menu currentMenu) {
-        logger.debug("Инициализация Navigator с меню: {}", currentMenu.getName());
+        if (currentMenu == null) {
+            throw new IllegalArgumentException("Menu cannot be null");
+        }
         this.currentMenu = currentMenu;
     }
 

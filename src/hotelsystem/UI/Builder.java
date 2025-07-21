@@ -3,11 +3,13 @@ package hotelsystem.UI;
 import hotelsystem.Controller.ManagerHotel;
 import hotelsystem.UI.action.Action;
 import hotelsystem.UI.action_factory.ActionFactory;
+import hotelsystem.dependencies.annotation.Component;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.dependencies.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Component
 public class Builder implements Action {
     private static final Logger logger = LoggerFactory.getLogger(Builder.class);
 
@@ -16,15 +18,16 @@ public class Builder implements Action {
     private ManagerHotel managerHotel;
     @Inject
     private ActionFactory actionFactory;
+    private volatile boolean initialized = false;
+    private final Object lock = new Object();
 
     @PostConstruct
     public void init() {
-        logger.info("Инициализация Builder");
-        execute();
+        if (initialized) return;
+        initialized = true;
     }
-
     public void buildMenu() {
-        logger.info("Построение структуры меню");
+        if (rootMenu != null) return;
         rootMenu = new Menu("Главное меню гостиницы");
 
         rootMenu.addMenuItem(new MenuItem("Номера", null, buildRoomsMenu()));
@@ -186,13 +189,17 @@ public class Builder implements Action {
 
     public Menu getRootMenu() {
         if (rootMenu == null) {
-            buildMenu();
+            synchronized (lock) {
+                if (rootMenu == null) {
+                    buildMenu();
+                }
+            }
         }
         return rootMenu;
     }
+
     @Override
     public void execute() {
-        logger.info("Выполнение построения меню");
-        buildMenu();
+        getRootMenu();
     }
 }

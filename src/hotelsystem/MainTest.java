@@ -6,7 +6,7 @@ import hotelsystem.UI.MenuController;
 import hotelsystem.Utils.DatabaseManager;
 import hotelsystem.dependencies.context.AppContext;
 import hotelsystem.dependencies.factory.BeanFactory;
-import org.apache.log4j.BasicConfigurator;
+//import org.apache.log4j.BasicConfigurator;
 
 public class MainTest {
 

@@ -16,12 +16,10 @@ public class MenuItem {
         this.title = title;
         this.action = action;
         this.nextMenu = nextMenu;
-        logger.debug("Создан пункт меню: {}", title);
     }
 
     public void doAction() {
         if (action != null) {
-            logger.info("Выполнение действия: {}", title);
             action.execute();
         }
     }

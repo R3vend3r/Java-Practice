@@ -4,10 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import hotelsystem.Controller.ManagerHotel;
 import hotelsystem.UI.action_factory.ActionFactory;
+import hotelsystem.dependencies.annotation.Component;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.dependencies.annotation.PostConstruct;
+
 import java.util.Scanner;
 
+@Component
 public class MenuController {
     private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
 
@@ -20,49 +23,69 @@ public class MenuController {
     @Inject
     private Builder builder;
 
-    @Inject
     private Navigator navigator;
+    private final Object navigatorLock = new Object();
+    private boolean initialized = false;
 
     @PostConstruct
     public void init() {
+        if (initialized) {
+            return;
+        }
+
         logger.info("Инициализация MenuController");
         logger.debug("Manager в MenuController: {}", dataManager);
-        this.navigator = new Navigator(builder.getRootMenu());
+
+        // Гарантируем, что меню построено
+        builder.getRootMenu();
+
+        initialized = true;
+    }
+
+    private Navigator getNavigator() {
+        if (navigator == null) {
+            synchronized (navigatorLock) {
+                if (navigator == null) {
+                    navigator = new Navigator(builder.getRootMenu());
+                }
+            }
+        }
+        return navigator;
     }
 
     public void run() {
-        logger.info("Запуск меню");
         Scanner scanner = new Scanner(System.in);
         boolean isRun = true;
+        Navigator currentNavigator = getNavigator();
 
         while (isRun) {
-            navigator.printMenu();
-            int number;
+            currentNavigator.printMenu();
+
+            int choice;
             try {
-                number = scanner.nextInt();
+                choice = scanner.nextInt();
                 scanner.nextLine();
-                logger.debug("Пользователь выбрал пункт: {}", number);
-            }
-            catch (Exception exception) {
-                logger.error("Ошибка ввода: {}", exception.getMessage());
-                System.out.println("Ошибка ввода! ");
+                logger.debug("Пользователь выбрал пункт: {}", choice);
+            } catch (Exception e) {
+                logger.error("Ошибка ввода: {}", e.getMessage());
+                System.out.println("Ошибка ввода! Пожалуйста, введите число.");
                 scanner.nextLine();
                 continue;
             }
 
-            if (number == 0) {
-                if (navigator.isEmpty()) {
+            if (choice == 0) {
+                if (currentNavigator.isEmpty()) {
                     logger.info("Завершение работы меню");
                     isRun = false;
-                }
-                else {
+                } else {
                     logger.debug("Возврат в предыдущее меню");
-                    navigator.backMenu();
+                    currentNavigator.backMenu();
                 }
-            }
-            else {
-                navigator.navigate(number);
+            } else {
+                currentNavigator.navigate(choice);
             }
         }
+
+        scanner.close();
     }
 }
