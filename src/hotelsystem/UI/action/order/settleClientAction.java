@@ -41,7 +41,7 @@ public class settleClientAction implements Action {
             Client client = new Client(name, surname);
             manager.registerClient(client);
 
-            List<Room> availableRooms = manager.getRooms(SortType.NONE, true).values()
+            List<Room> availableRooms = manager.getRooms(SortType.NONE, true)
                     .stream()
                     .filter(Room::isAvailable)
                     .toList();

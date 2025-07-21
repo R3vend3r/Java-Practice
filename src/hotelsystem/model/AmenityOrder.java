@@ -1,33 +1,40 @@
 package hotelsystem.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Getter
 public class AmenityOrder extends Order {
-    private Amenity amenity;
+    @Getter
+    @Setter
+    private String amenityId;
     private Date serviceDate;
+    @Setter
+    @Getter
+    private double price;
+    @Setter
+    private Client client;
+    @Setter
+    private Amenity amenity;
 
-    public AmenityOrder() {
-    }
+    public AmenityOrder() {}
 
-    public AmenityOrder(String id, Client client, double totalPrice, Amenity amenity, Date serviceDate) {
-        super(id, client, totalPrice, new Date(), serviceDate);
-        setAmenity(amenity);
+    public AmenityOrder(String id, String clientId, double totalPrice,
+                        String amenityId, Date serviceDate) {
+        super(id, clientId, totalPrice, new Date(), serviceDate);
+        setAmenityId(amenityId);
         setServiceDate(serviceDate);
-        setTotalPrice(amenity.getPrice());
+        setPrice(totalPrice);
     }
 
-    public AmenityOrder(Client client, Amenity amenity, Date serviceDate) {
-        super(client, amenity.getPrice(), new Date(), serviceDate);
+    public AmenityOrder(String id, Client client, double totalPrice, Amenity amenity, Date serviceDate ){
+        super(id, client.getId(), totalPrice, amenity.getId(), serviceDate);
+        setClient(client);
         setAmenity(amenity);
-        setServiceDate(serviceDate);
-    }
 
-    public void setAmenity(Amenity amenity) {
-        this.amenity = Objects.requireNonNull(amenity, "Amenity cannot be null");
     }
 
     public void setServiceDate(Date serviceDate) {

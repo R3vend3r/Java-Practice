@@ -1,8 +1,7 @@
 package hotelsystem.repository;
 
-
 import hotelsystem.dependencies.annotation.Component;
-import hotelsystem.interfaceClass.*;
+import hotelsystem.interfaceClass.IAmenityRepository;
 import hotelsystem.model.Amenity;
 
 import java.util.*;
@@ -11,10 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class AmenityRepository implements IAmenityRepository {
     private final List<Amenity> amenities = new CopyOnWriteArrayList<>();
-
-//    public AmenityRepository() {
-//        this.amenities = new CopyOnWriteArrayList<>();
-//    }
 
     @Override
     public void addAmenity(Amenity amenity) throws IllegalArgumentException {

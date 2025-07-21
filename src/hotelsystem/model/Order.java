@@ -1,6 +1,7 @@
 package hotelsystem.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -9,24 +10,35 @@ import java.util.Objects;
 @Getter
 public abstract class Order implements Serializable {
     private String id;
-    private Client client;
+    @Setter
+    private String clientId;
     private Date creationDate;
     private Date availableDate;
     private double totalPrice;
+    @Setter
+    private String amenityId;
 
     public Order() {
     }
 
-    protected Order(String id, Client client, double totalPrice, Date creationDate, Date availableDate) {
+    protected Order(String id, String clientId, double totalPrice, Date creationDate, Date availableDate) {
         setId(id);
-        setClient(client);
+        setClientId(clientId);
         setCreationDate(creationDate);
         setAvailableDate(availableDate);
         setTotalPrice(totalPrice);
     }
 
-    protected Order(Client client, double totalPrice, Date createInDate, Date availableDate) {
-        this(generateId(), client, totalPrice, createInDate, availableDate);
+    protected Order(String id, String clientId, double totalPrice, String amenityId, Date availableDate) {
+        setId(id);
+        setClientId(clientId);
+        setCreationDate(availableDate);
+        setAmenityId(amenityId);
+        setTotalPrice(totalPrice);
+    }
+
+    protected Order(String clientId, double totalPrice, Date createInDate, Date availableDate) {
+        this(generateId(), clientId, totalPrice, createInDate, availableDate);
     }
 
     static String generateId() {
@@ -38,10 +50,6 @@ public abstract class Order implements Serializable {
         if (id.isBlank()) {
             throw new IllegalArgumentException("Order ID cannot be blank");
         }
-    }
-
-    public void setClient(Client client) {
-        this.client = Objects.requireNonNull(client, "Client cannot be null");
     }
 
     public void setCreationDate(Date creationDate) {

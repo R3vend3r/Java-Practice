@@ -72,8 +72,8 @@ public class ActionFactoryController implements ActionFactory {
     }
 
     @Override
-    public Action getRoomDetailsAction() {
-        return new getRoomDetailsAction(actionFactoryController);
+    public Action FindRoomAction() {
+        return new FindRoomAction(actionFactoryController);
     }
 
     @Override
@@ -256,13 +256,13 @@ public class ActionFactoryController implements ActionFactory {
         return new getFullRoomHistoryAction(actionFactoryController);
     }
 
-    @Override
-    public Action saveStateAction() {
-        return new saveStateAction(actionFactoryController);
-    }
-
-    @Override
-    public Action loadStateAction() {
-        return new loadStateAction(actionFactoryController);
-    }
+//    @Override
+//    public Action saveStateAction() {
+//        return new saveStateAction(actionFactoryController);
+//    }
+//
+//    @Override
+//    public Action loadStateAction() {
+//        return new loadStateAction(actionFactoryController);
+//    }
 }

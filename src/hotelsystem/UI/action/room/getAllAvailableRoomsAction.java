@@ -23,7 +23,7 @@ public class getAllAvailableRoomsAction implements Action {
         if (rooms.isEmpty()) {
             System.out.println("Свободных номеров нет");
         } else {
-            rooms.values().forEach(System.out::println);
+            rooms.forEach(System.out::println);
         }
 
         System.out.println("----------------------------------");

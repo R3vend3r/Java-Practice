@@ -65,7 +65,7 @@ public class Builder implements Action {
         viewRoomsMenu.addMenuItem(new MenuItem("Сортировка свободных", null, sortAvailableRoomsMenu));
         roomsMenu.addMenuItem(new MenuItem("Просмотр номеров", null, viewRoomsMenu));
 
-        roomsMenu.addMenuItem(new MenuItem("Детали номера", actionFactory.getRoomDetailsAction(), null));
+        roomsMenu.addMenuItem(new MenuItem("Детали номера", actionFactory.FindRoomAction(), null));
 
         return roomsMenu;
     }
@@ -141,8 +141,8 @@ public class Builder implements Action {
         operationsMenu.addMenuItem(new MenuItem("Проверить доступность номера", actionFactory.checkRoomAvailabilityAction(), null));
         operationsMenu.addMenuItem(new MenuItem("Добавить услугу клиенту", actionFactory.addAmenityToClientAction(), null));
 
-        operationsMenu.addMenuItem(new MenuItem("Сохранить состояние", actionFactory.saveStateAction(), null));
-        operationsMenu.addMenuItem(new MenuItem("Загрузить состояние", actionFactory.loadStateAction(), null));
+//        operationsMenu.addMenuItem(new MenuItem("Сохранить состояние", actionFactory.saveStateAction(), null));
+//        operationsMenu.addMenuItem(new MenuItem("Загрузить состояние", actionFactory.loadStateAction(), null));
 
         return operationsMenu;
     }

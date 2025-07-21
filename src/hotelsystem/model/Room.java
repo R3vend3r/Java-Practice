@@ -17,11 +17,10 @@ import java.util.Objects;
 import java.util.Queue;
 
 public class Room implements Serializable {
-    @Getter
-    private String id;
     @Setter
     @Getter
     private int numberRoom;
+    @Setter
     @Getter
     @JsonProperty("available")
     private boolean isAvailable;
@@ -32,6 +31,7 @@ public class Room implements Serializable {
     private RoomType type;
     @Getter
     private double priceForDay;
+    @Setter
     @Getter
     private Date availableDate;
     @Getter
@@ -49,9 +49,8 @@ public class Room implements Serializable {
     public Room() {
     }
 
-    public Room(String id, int number, RoomType type, double priceForDay, int capacity,
+    public Room(int number, RoomType type, double priceForDay, int capacity,
                 RoomCondition condition, int stars) {
-        setId(id);
         setNumberRoom(number);
         setType(type);
         setPriceForDay(priceForDay);
@@ -62,7 +61,7 @@ public class Room implements Serializable {
     }
 
     public Room(int number, RoomType type, double priceForDay, int capacity) {
-        this(generateId(), number, type, priceForDay, capacity,
+        this(number, type, priceForDay, capacity,
                 RoomCondition.READY, 3);
     }
 
@@ -78,17 +77,6 @@ public class Room implements Serializable {
         }
     }
 
-    private static String generateId() {
-        return "RM-" + System.currentTimeMillis();
-    }
-
-    public void setId(String id) {
-        this.id = Objects.requireNonNull(id, "Room ID cannot be null");
-        if (id.isBlank()) {
-            throw new IllegalArgumentException("Room ID cannot be blank");
-        }
-    }
-
     public void clearRoom() {
         isAvailable = true;
         roomCondition = RoomCondition.CLEANING_REQUIRED;
@@ -96,14 +84,10 @@ public class Room implements Serializable {
         availableDate = null;
     }
 
-    public void changeAvailability() {
-        this.isAvailable = !isAvailable;
-    }
-
-    public void setClientIdAndDateAvailable(String clientId, Date availableDate) {
-        this.clientId = Objects.requireNonNull(clientId);
-        this.availableDate = Objects.requireNonNull(availableDate);
-    }
+//    public void setClientIdAndDateAvailable(String clientId, Date availableDate) {
+//        this.clientId = Objects.requireNonNull(clientId);
+//        this.availableDate = Objects.requireNonNull(availableDate);
+//    }
 
     public void setPriceForDay(double priceForDay) {
         if (priceForDay <= 0) {

@@ -1,51 +1,34 @@
 package hotelsystem.repository;
 
 import hotelsystem.dependencies.annotation.Component;
-import hotelsystem.interfaceClass.*;
+import hotelsystem.interfaceClass.IClientRepository;
 import hotelsystem.model.Client;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class ClientRepository implements IClientRepository {
-    private final List<Client> clients = new CopyOnWriteArrayList<>();;
-
-//    public ClientRepository() {
-//        this.clients = new CopyOnWriteArrayList<>(); // Потокобезопасная коллекция
-//    }
+    private final Map<String, Client> clients = new ConcurrentHashMap<>();
 
     @Override
-    public void addClient(Client client) throws IllegalArgumentException {
+    public void addClient(Client client) {
         Objects.requireNonNull(client, "Client cannot be null");
-
-        if (clientExists(client.getId())) {
-            throw new IllegalArgumentException("Client with ID " + client.getId() + " already exists");
-        }
-
-        clients.add(client);
-    }
-
-    @Override
-    public boolean clientExists(String clientId) {
-        Objects.requireNonNull(clientId, "Client ID cannot be null");
-        return clients.stream().anyMatch(c -> c.getId().equals(clientId));
+        clients.put(client.getId(), client);
     }
 
     @Override
     public Optional<Client> findClientByRoomNumber(int roomNumber) {
-        return clients.stream()
-                .filter(client -> client.getRoomNumber() == roomNumber)
+        return clients.values().stream()
+                .filter(c -> c.getRoomNumber() == roomNumber)
                 .findFirst();
     }
 
     @Override
     public Optional<Client> findClientById(String clientId) {
-        Objects.requireNonNull(clientId, "Client ID cannot be null");
-        return clients.stream()
-                .filter(c -> c.getId().equals(clientId))
-                .findFirst();
+        return Optional.ofNullable(clients.get(clientId));
     }
+
     @Override
     public int getClientCount() {
         return clients.size();
@@ -53,23 +36,22 @@ public class ClientRepository implements IClientRepository {
 
     @Override
     public void removeClientByRoomNumber(int roomNumber) {
-        clients.removeIf(client -> client.getRoomNumber() == roomNumber);
+        clients.values().removeIf(c -> c.getRoomNumber() == roomNumber);
     }
 
     @Override
-    public void assignRoomToClient(String clientId, int roomNumber) throws IllegalArgumentException{
-        Objects.requireNonNull(clientId, "Client ID cannot be null");
-
-        findClientById(clientId).ifPresentOrElse(
-                client -> client.setRoomNumber(roomNumber),
-                () -> { throw new IllegalArgumentException("Client not found"); }
-        );
+    public void assignRoomToClient(String clientId, int roomNumber) {
+        Client client = clients.get(clientId);
+        if (client != null) {
+            client.setRoomNumber(roomNumber);
+        }
     }
 
     @Override
     public List<Client> getAllClients() {
-        return Collections.unmodifiableList(clients);
+        return new ArrayList<>(clients.values());
     }
+
     @Override
     public void clearAll() {
         clients.clear();

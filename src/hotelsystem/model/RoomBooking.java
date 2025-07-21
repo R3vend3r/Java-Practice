@@ -15,13 +15,17 @@ public class RoomBooking extends Order {
     private Date checkInDate;
     private double totalPrice;
     private List<AmenityOrder> services;
+    @Getter
+    @Setter
+    private Client client;
 
     public RoomBooking() {
     }
 
-    public RoomBooking(String id, Client client, Room room, double totalPrice, Date checkOutDate, Date checkInDate) {
-        super(id, client, totalPrice, checkInDate, checkOutDate);
+    public RoomBooking(String id, Client client, Room room, double totalPrice, Date checkInDate, Date checkOutDate) {
+        super(id, client.getId(), totalPrice, checkInDate, checkOutDate);
         setRoom(room);
+        setClient(client);
         setCheckOutDate(checkOutDate);
         setTotalPrice(totalPrice);
         setCheckInDate(checkInDate);
@@ -29,7 +33,7 @@ public class RoomBooking extends Order {
     }
 
     public RoomBooking(Client client, Room room, double totalPrice, Date checkInDate, Date checkOutDate) {
-        super(client, totalPrice,checkInDate, checkOutDate);
+        super(client.getId(), totalPrice,checkInDate, checkOutDate);
         setRoom(room);
         setCheckOutDate(checkOutDate);
         setCheckInDate(checkInDate);

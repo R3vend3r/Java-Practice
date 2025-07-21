@@ -27,7 +27,7 @@ public interface ActionFactory {
     public Action getAllAvailableRoomsSortedByTypeAction();
 
     public Action getAllCompletedBookingsAction();
-    public Action getRoomDetailsAction();
+    public Action FindRoomAction();
     public Action getAvailableRoomsByDateAction();
 
     public Action getAllClientsSortedByAlphabetAction();
@@ -65,7 +65,7 @@ public interface ActionFactory {
 
     Action getFullRoomHistoryAction();
 
-    Action saveStateAction();
-
-    Action loadStateAction();
+//    Action saveStateAction();
+//
+//    Action loadStateAction();
 }

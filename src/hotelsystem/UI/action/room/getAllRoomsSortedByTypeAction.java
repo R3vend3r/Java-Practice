@@ -14,7 +14,7 @@ public class getAllRoomsSortedByTypeAction implements Action {
     @Override
     public void execute() {
         System.out.println("\nНомера (сортировка по типу):");
-        manager.getRooms(SortType.TYPE, false).values()
+        manager.getRooms(SortType.TYPE, false)
                 .forEach(System.out::println);
     }
 }

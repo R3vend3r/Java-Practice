@@ -1,7 +1,5 @@
 package hotelsystem.repository;
 
-import hotelsystem.comparator.AmenityComparator.*;
-import hotelsystem.comparator.OrderCorparator.*;
 import hotelsystem.dependencies.annotation.Component;
 import hotelsystem.interfaceClass.*;
 import hotelsystem.enums.SortType;
@@ -12,93 +10,44 @@ import java.util.stream.Collectors;
 
 @Component
 public class OrderRepository implements IOrderRepository {
-    private final List<RoomBooking> activeBookings = new ArrayList<>();
-    private final List<RoomBooking> completedBookings = new ArrayList<>();
-    private final List<AmenityOrder> amenityOrders = new ArrayList<>();
-
-//    public OrderRepository() {
-//        this.activeBookings = new ArrayList<>();
-//        this.completedBookings = new ArrayList<>();
-//        this.amenityOrders = new ArrayList<>();
-//    }
+    private final Map<String, RoomBooking> activeBookings = new HashMap<>();
+    private final Map<String, AmenityOrder> amenityOrders = new HashMap<>();
 
     @Override
-    public void createRoomBooking(Client client, Room room,
-                                  Date checkInDate, Date checkOutDate) {
-        Objects.requireNonNull(client, "Client cannot be null");
-        Objects.requireNonNull(room, "Room cannot be null");
-        Objects.requireNonNull(checkInDate, "CheckIn date cannot be null");
-        Objects.requireNonNull(checkOutDate, "CheckOut date cannot be null");
-
-        if (checkOutDate.before(checkInDate)) {
-            throw new IllegalArgumentException("CheckOut date must be after CheckIn date");
-        }
-        double price = room.getPriceForDay();
-        double totalPrice = calculateStayCost(price, checkInDate, checkOutDate);
-        RoomBooking booking = new RoomBooking(client, room, totalPrice, new Date(), checkOutDate);
-        activeBookings.add(booking);
-        completedBookings.add(booking);
-    }
-
-
-    @Override
-    public double calculateStayCost(double priceForDay, Date checkInDate, Date endDate) {
-        Objects.requireNonNull(endDate, "End date cannot be null");
-        return priceForDay * calculateDaysBetween(checkInDate, endDate);
-    }
-
-    private double calculateDaysBetween(Date start, Date end) {
-        long diff = end.getTime() - start.getTime();
-        return Math.ceil((double) diff / (1000 * 60 * 60 * 24));
+    public void addRoomBooking(RoomBooking booking) {
+        activeBookings.put(booking.getId(), booking);
     }
 
     @Override
-    public AmenityOrder addAmenityOrder(Client client, Amenity amenity, Date serviceDate) {
-        Objects.requireNonNull(client, "Client cannot be null");
-        Objects.requireNonNull(amenity, "Amenity cannot be null");
-        Objects.requireNonNull(serviceDate, "Service date cannot be null");
-
-        AmenityOrder order = new AmenityOrder(client, amenity, serviceDate);
-        amenityOrders.add(order);
-        return order;
-    }
-
-    @Override
-    public void completeRoomBooking(int roomNumber, Date checkOutDate) throws IllegalArgumentException {
-        Objects.requireNonNull(checkOutDate, "CheckOut date cannot be null");
-
-        RoomBooking booking = activeBookings.stream()
+    public Optional<RoomBooking> findActiveBookingByRoom(int roomNumber) {
+        return activeBookings.values().stream()
                 .filter(b -> b.getRoom().getNumberRoom() == roomNumber)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Room " + roomNumber + " is not occupied"));
-
-        booking.setCheckOutDate(checkOutDate);
-        activeBookings.remove(booking);
+                .findFirst();
     }
 
     @Override
-    public List<RoomBooking> getActiveBookings() {
-        return Collections.unmodifiableList(activeBookings);
+    public void addAmenityOrder(AmenityOrder order) {
+        amenityOrders.put(order.getId(), order);
     }
 
     @Override
     public List<AmenityOrder> getAmenityOrders() {
-        return Collections.unmodifiableList(amenityOrders);
+        return new ArrayList<>(amenityOrders.values());
     }
 
     @Override
     public List<RoomBooking> getCompletedBookings() {
-        return Collections.unmodifiableList(completedBookings);
+        return new ArrayList<>(activeBookings.values());
     }
 
     @Override
     public double calculatingTotalIncome() {
-        double bookingsIncome = completedBookings.stream()
+        double bookingsIncome = activeBookings.values().stream()
                 .mapToDouble(RoomBooking::getTotalPrice)
                 .sum();
 
-        double amenitiesIncome = amenityOrders.stream()
-                .mapToDouble(order -> order.getAmenity().getPrice())
+        double amenitiesIncome = amenityOrders.values().stream()
+                .mapToDouble(AmenityOrder::getTotalPrice)
                 .sum();
 
         return bookingsIncome + amenitiesIncome;
@@ -106,64 +55,48 @@ public class OrderRepository implements IOrderRepository {
 
     @Override
     public double calculateAmenityCost(int roomNumber) {
-        return activeBookings.stream()
-                .filter(booking -> booking.getRoom().getNumberRoom() == roomNumber)
-                .flatMap(booking -> booking.getServices().stream())
-                .mapToDouble(order -> order.getAmenity().getPrice())
+        return activeBookings.values().stream()
+                .filter(b -> b.getRoom().getNumberRoom() == roomNumber)
+                .flatMap(b -> b.getServices().stream())
+                .mapToDouble(AmenityOrder::getTotalPrice)
                 .sum();
     }
 
     @Override
-    public List<RoomBooking> getSortedBookings(SortType sortType) throws IllegalArgumentException{
-        Objects.requireNonNull(sortType, "Sort type cannot be null");
-
-        Comparator<Order> comparator = switch (sortType) {
-            case ALPHABET -> new AlphabetComparator();
-            case DATE_END -> new DateComparator();
-            case NONE -> (a, b) -> 0;
-            default -> throw new IllegalArgumentException("Unsupported sort type for bookings: " + sortType);
+    public List<RoomBooking> getSortedBookings(SortType sortType) {
+        Comparator<RoomBooking> comparator = switch (sortType) {
+            case ALPHABET -> Comparator.comparing(b -> b.getClientId());
+            case DATE_END -> Comparator.comparing(RoomBooking::getCheckOutDate);
+            case PRICE -> Comparator.comparing(RoomBooking::getTotalPrice);
+            default -> (a, b) -> 0;
         };
-
-        return activeBookings.stream()
-                .sorted(comparator.reversed())
+        return activeBookings.values().stream()
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<AmenityOrder> getSortedAmenityOrders(SortType sortType) throws IllegalArgumentException{
-        Objects.requireNonNull(sortType, "Sort type cannot be null");
-
+    public List<AmenityOrder> getSortedAmenityOrders(SortType sortType) {
         Comparator<AmenityOrder> comparator = switch (sortType) {
-            case DATE_END -> new DateAmenComparator();
-            case PRICE -> new PriceAmenComparator();
-            case NONE -> (a, b) -> 0;
-            default -> throw new IllegalArgumentException("Unsupported sort type for amenities: " + sortType);
+            case DATE_END -> Comparator.comparing(AmenityOrder::getServiceDate);
+            case PRICE -> Comparator.comparing(AmenityOrder::getTotalPrice);
+            default -> (a, b) -> 0;
         };
-
-        return amenityOrders.stream()
-                .sorted(comparator.reversed())
+        return amenityOrders.values().stream()
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<RoomBooking> getLastThreeBookingsForRoom(int roomNumber) {
-        return completedBookings.stream()
-                .filter(booking -> booking.getRoom().getNumberRoom() == roomNumber)
-                .sorted(Comparator.comparing(RoomBooking::getCheckOutDate).reversed())
-                .limit(3)
+    public List<AmenityOrder> getAmenityOrdersForBooking(String bookingId) {
+        return amenityOrders.values().stream()
+                .filter(o -> o.getClientId().equals(bookingId))
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<RoomBooking> findActiveBookingByRoom(int roomNumber) {
-        return activeBookings.stream()
-                .filter(booking -> booking.getRoom().getNumberRoom() == roomNumber)
-                .findFirst();
-    }
     @Override
     public void clearAll() {
-        amenityOrders.clear();
-        completedBookings.clear();
         activeBookings.clear();
+        amenityOrders.clear();
     }
 }

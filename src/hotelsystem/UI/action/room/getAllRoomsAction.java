@@ -14,7 +14,7 @@ public class getAllRoomsAction implements Action {
     @Override
     public void execute() {
         System.out.println("\nВсе номера:");
-        manager.getRooms(SortType.NONE, false).values().forEach(System.out::println);
+        manager.getRooms(SortType.NONE, false).forEach(System.out::println);
         System.out.println("Всего: " + manager.getRooms(SortType.NONE, false).size());
     }
 }

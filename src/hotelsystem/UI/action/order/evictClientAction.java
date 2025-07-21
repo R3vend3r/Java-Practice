@@ -3,6 +3,7 @@ package hotelsystem.UI.action.order;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 
+import java.sql.SQLException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -27,7 +28,11 @@ public class evictClientAction implements Action {
                         System.out.println("Клиент: " + client);
                         System.out.print("Выселить (да/нет)? ");
                         if(scanner.nextLine().equalsIgnoreCase("да")) {
-                            manager.evictClient(roomNumber);
+                            try {
+                                manager.evictClient(roomNumber);
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
                             System.out.println("Клиент выселен");
                         }
                     },

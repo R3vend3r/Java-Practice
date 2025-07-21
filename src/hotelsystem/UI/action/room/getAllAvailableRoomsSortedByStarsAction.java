@@ -14,7 +14,7 @@ public class getAllAvailableRoomsSortedByStarsAction implements Action {
     @Override
     public void execute() {
         System.out.println("\nСвободные номера (по звездам):");
-        manager.getRooms(SortType.STARS, true).values()
+        manager.getRooms(SortType.STARS, true)
                 .forEach(r -> System.out.printf("%d - %d★ (%s)%n",
                         r.getNumberRoom(), r.getStars(), r.getType()));
     }

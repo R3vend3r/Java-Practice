@@ -14,7 +14,7 @@ public class getAllRoomsSortedByPriceAction implements Action {
     @Override
     public void execute() {
         System.out.println("\nНомера (сортировка по цене):");
-        manager.getRooms(SortType.PRICE, false).values()
+        manager.getRooms(SortType.PRICE, false)
                 .forEach(r -> System.out.printf("%d - %.2f руб.%n",
                         r.getNumberRoom(), r.getPriceForDay()));
     }

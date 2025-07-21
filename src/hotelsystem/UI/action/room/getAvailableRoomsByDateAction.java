@@ -2,14 +2,17 @@ package hotelsystem.UI.action.room;
 
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
+import hotelsystem.model.Room;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class getAvailableRoomsByDateAction implements Action {
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
+    private final SimpleDateFormat outputDateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     public getAvailableRoomsByDateAction(ManagerHotel manager) {
         this.manager = manager;
@@ -34,17 +37,21 @@ public class getAvailableRoomsByDateAction implements Action {
             }
 
             System.out.println("\nДоступные номера:");
-            var availableRooms = manager.getAvailableRoomsByDate(date);
+            List<Room> availableRooms = manager.getAvailableRoomsByDate(date);
 
             if (availableRooms.isEmpty()) {
                 System.out.println("Нет доступных номеров на эту дату");
                 return;
             }
 
-            availableRooms.values().forEach(r -> {
-                String status = r.isAvailable() ? "Свободен сейчас" :
-                        "Освободится " + new SimpleDateFormat("dd.MM.yyyy").format(r.getAvailableDate());
-                System.out.printf("%d - %s (%s)%n", r.getNumberRoom(), r.getType(), status);
+            availableRooms.forEach(room -> {
+                String status = room.isAvailable()
+                        ? "Свободен сейчас"
+                        : "Освободится " + outputDateFormat.format(room.getAvailableDate());
+                System.out.printf("%d - %s (%s)%n",
+                        room.getNumberRoom(),
+                        room.getType(),
+                        status);
             });
 
         } catch (Exception e) {

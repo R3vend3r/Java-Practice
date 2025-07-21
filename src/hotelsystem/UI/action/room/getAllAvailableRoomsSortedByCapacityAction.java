@@ -14,7 +14,7 @@ public class getAllAvailableRoomsSortedByCapacityAction implements Action {
     @Override
     public void execute() {
         System.out.println("\nСвободные номера (по вместимости):");
-        manager.getRooms(SortType.CAPACITY, true).values()
+        manager.getRooms(SortType.CAPACITY, true)
                 .forEach(r -> System.out.printf("%d - %d чел. (%s)%n",
                         r.getNumberRoom(), r.getCapacity(), r.getType()));
     }
