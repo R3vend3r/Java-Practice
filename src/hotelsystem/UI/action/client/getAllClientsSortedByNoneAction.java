@@ -1,9 +1,12 @@
 package hotelsystem.UI.action.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 
 public class getAllClientsSortedByNoneAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(getAllClientsSortedByNoneAction.class);
     private final ManagerHotel manager;
 
     public getAllClientsSortedByNoneAction(ManagerHotel manager) {
@@ -12,15 +15,22 @@ public class getAllClientsSortedByNoneAction implements Action {
 
     @Override
     public void execute() {
-        System.out.println("\n=== Список клиентов ===");
-        manager.getAllClients().forEach(client -> {
-            String roomInfo = client.getRoomNumber() > 0 ?
-                    "Номер " + client.getRoomNumber() : "Не заселен";
-            System.out.printf("%s %s | %s | ID: %s%n",
-                    client.getName(),
-                    client.getSurname(),
-                    roomInfo,
-                    client.getId());
-        });
+        logger.info("Начало получения полного списка клиентов");
+        try {
+            System.out.println("\n=== Список клиентов ===");
+            manager.getAllClients().forEach(client -> {
+                String roomInfo = client.getRoomNumber() > 0 ?
+                        "Номер " + client.getRoomNumber() : "Не заселен";
+                System.out.printf("%s %s | %s | ID: %s%n",
+                        client.getName(),
+                        client.getSurname(),
+                        roomInfo,
+                        client.getId());
+            });
+            logger.info("Успешно получено {} клиентов", manager.getAllClients().size());
+        } catch (Exception e) {
+            logger.error("Ошибка при получении клиентов: ", e);
+            System.err.println("Ошибка: " + e.getMessage());
+        }
     }
 }

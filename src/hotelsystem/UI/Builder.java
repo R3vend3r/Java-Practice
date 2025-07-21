@@ -5,8 +5,11 @@ import hotelsystem.UI.action.Action;
 import hotelsystem.UI.action_factory.ActionFactory;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.dependencies.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Builder implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(Builder.class);
 
     private Menu rootMenu;
     @Inject
@@ -16,10 +19,12 @@ public class Builder implements Action {
 
     @PostConstruct
     public void init() {
+        logger.info("Инициализация Builder");
         execute();
     }
 
     public void buildMenu() {
+        logger.info("Построение структуры меню");
         rootMenu = new Menu("Главное меню гостиницы");
 
         rootMenu.addMenuItem(new MenuItem("Номера", null, buildRoomsMenu()));
@@ -37,6 +42,7 @@ public class Builder implements Action {
     }
 
     private Menu buildRoomsMenu() {
+        logger.debug("Создание меню для управления номерами");
         System.out.println();
         Menu roomsMenu = new Menu("Управление номерами");
 
@@ -186,6 +192,7 @@ public class Builder implements Action {
     }
     @Override
     public void execute() {
+        logger.info("Выполнение построения меню");
         buildMenu();
     }
 }

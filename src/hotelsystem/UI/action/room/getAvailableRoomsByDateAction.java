@@ -1,5 +1,7 @@
 package hotelsystem.UI.action.room;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 import hotelsystem.model.Room;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class getAvailableRoomsByDateAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(getAvailableRoomsByDateAction.class);
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
@@ -32,13 +35,15 @@ public class getAvailableRoomsByDateAction implements Action {
             Date date = dateFormat.parse(dateStr);
 
             if (date.before(new Date())) {
+                logger.warn("Введена дата в прошлом: {}", dateStr);
                 System.out.println("Ошибка: дата должна быть в будущем");
                 return;
             }
 
-            System.out.println("\nДоступные номера:");
             List<Room> availableRooms = manager.getAvailableRoomsByDate(date);
+            logger.info("Найдено {} доступных номеров на дату {}", availableRooms.size(), dateStr);
 
+            System.out.println("\nДоступные номера:");
             if (availableRooms.isEmpty()) {
                 System.out.println("Нет доступных номеров на эту дату");
                 return;
@@ -55,6 +60,7 @@ public class getAvailableRoomsByDateAction implements Action {
             });
 
         } catch (Exception e) {
+            logger.error("Ошибка при проверке доступности номеров: {}", e.getMessage());
             System.out.println("Ошибка: неверный формат даты. Используйте дд.мм.гг");
         }
     }

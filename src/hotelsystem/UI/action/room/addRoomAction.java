@@ -1,5 +1,7 @@
 package hotelsystem.UI.action.room;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.UI.action.Action;
 import hotelsystem.enums.RoomType;
 import hotelsystem.Controller.ManagerHotel;
@@ -7,6 +9,7 @@ import hotelsystem.model.Room;
 import java.util.Scanner;
 
 public class addRoomAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(addRoomAction.class);
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
 
@@ -16,6 +19,7 @@ public class addRoomAction implements Action {
 
     @Override
     public void execute() {
+        logger.info("Начало добавления нового номера");
         try {
             System.out.println("\nДобавление номера:");
             System.out.print("Номер комнаты: ");
@@ -34,10 +38,17 @@ public class addRoomAction implements Action {
             System.out.print("Вместимость: ");
             int capacity = scanner.nextInt();
 
-            manager.addRoom(new Room(number, roomType, price, capacity));
+            Room room = new Room(number, roomType, price, capacity);
+            manager.addRoom(room);
+            logger.info("Добавлен новый номер: {}", room);
             System.out.println("Номер добавлен");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            logger.error("Неверный тип комнаты");
+            System.out.println("Ошибка: неверный тип комнаты");
         } catch (Exception e) {
+            logger.error("Ошибка при добавлении номера: {}", e.getMessage());
             System.out.println("Ошибка: " + e.getMessage());
+        } finally {
             scanner.nextLine();
         }
     }

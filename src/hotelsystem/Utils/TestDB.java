@@ -8,6 +8,8 @@ import hotelsystem.model.Client;
 import hotelsystem.model.Room;
 import hotelsystem.model.RoomBooking;
 import hotelsystem.service.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 

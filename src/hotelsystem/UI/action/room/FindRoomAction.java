@@ -1,5 +1,7 @@
 package hotelsystem.UI.action.room;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 import hotelsystem.model.Room;
@@ -8,6 +10,7 @@ import java.util.InputMismatchException;
 import java.util.Optional;
 
 public class FindRoomAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(FindRoomAction.class);
     private final ManagerHotel manager;
     private final Scanner scanner = new Scanner(System.in);
 
@@ -26,6 +29,7 @@ public class FindRoomAction implements Action {
 
             if (roomOpt.isPresent()) {
                 Room room = roomOpt.get();
+                logger.info("Найден номер: {}", room);
                 System.out.println("\n=== Информация о комнате ===");
                 System.out.printf("Номер: %d\n", room.getNumberRoom());
                 System.out.printf("Тип: %s\n", room.getType());
@@ -42,13 +46,16 @@ public class FindRoomAction implements Action {
                     System.out.printf("Дата освобождения: %s\n", room.getAvailableDate());
                 }
             } else {
+                logger.warn("Комната с номером {} не найдена", roomNumber);
                 System.out.println("Комната с номером " + roomNumber + " не найдена");
             }
 
         } catch (InputMismatchException e) {
+            logger.error("Ошибка ввода: номер комнаты должен быть целым числом");
             System.err.println("Ошибка: Номер комнаты должен быть целым числом");
             scanner.nextLine();
         } catch (Exception e) {
+            logger.error("Неожиданная ошибка при поиске номера: {}", e.getMessage());
             System.err.println("Неожиданная ошибка: " + e.getMessage());
         }
     }

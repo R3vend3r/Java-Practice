@@ -1,9 +1,12 @@
 package hotelsystem.UI.action.room;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.UI.action.Action;
 import hotelsystem.Controller.ManagerHotel;
 
 public class getTotalCountAvailableRooms implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(getTotalCountAvailableRooms.class);
     private final ManagerHotel manager;
 
     public getTotalCountAvailableRooms(ManagerHotel manager) {
@@ -12,7 +15,8 @@ public class getTotalCountAvailableRooms implements Action {
 
     @Override
     public void execute() {
-        System.out.printf("\nСвободных номеров: %d%n",
-                manager.getAvailableRoomsCount());
+        int count = manager.getAvailableRoomsCount();
+        logger.info("Запрос количества свободных номеров: {}", count);
+        System.out.printf("\nСвободных номеров: %d%n", count);
     }
 }

@@ -19,7 +19,7 @@ public class MainTest {
 
     public static void main(String[] args) {
         try {
-            BasicConfigurator.configure();
+//            BasicConfigurator.configure();
 
             MainTest app = new MainTest();
             AppContext context = app.initializeContext();

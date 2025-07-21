@@ -1,14 +1,16 @@
 package hotelsystem.UI;
 
-import hotelsystem.UI.action_factory.ActionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import hotelsystem.Controller.ManagerHotel;
+import hotelsystem.UI.action_factory.ActionFactory;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.dependencies.annotation.PostConstruct;
-import lombok.Setter;
-
 import java.util.Scanner;
 
 public class MenuController {
+    private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
+
     @Inject
     private ManagerHotel dataManager;
 
@@ -23,11 +25,13 @@ public class MenuController {
 
     @PostConstruct
     public void init() {
-        System.out.println("Manager в MenuController: " + dataManager);
+        logger.info("Инициализация MenuController");
+        logger.debug("Manager в MenuController: {}", dataManager);
         this.navigator = new Navigator(builder.getRootMenu());
     }
 
     public void run() {
+        logger.info("Запуск меню");
         Scanner scanner = new Scanner(System.in);
         boolean isRun = true;
 
@@ -37,21 +41,26 @@ public class MenuController {
             try {
                 number = scanner.nextInt();
                 scanner.nextLine();
+                logger.debug("Пользователь выбрал пункт: {}", number);
             }
-            catch (Exception exception){
+            catch (Exception exception) {
+                logger.error("Ошибка ввода: {}", exception.getMessage());
                 System.out.println("Ошибка ввода! ");
                 scanner.nextLine();
                 continue;
             }
-            if (number == 0){
-                if (navigator.isEmpty()){
+
+            if (number == 0) {
+                if (navigator.isEmpty()) {
+                    logger.info("Завершение работы меню");
                     isRun = false;
                 }
-                else{
+                else {
+                    logger.debug("Возврат в предыдущее меню");
                     navigator.backMenu();
                 }
             }
-            else{
+            else {
                 navigator.navigate(number);
             }
         }
