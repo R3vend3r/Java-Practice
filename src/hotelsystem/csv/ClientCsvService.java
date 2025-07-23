@@ -19,7 +19,7 @@ public class ClientCsvService implements ICsvService<Client> {
                         CsvUtils.escapeCsv(client.getId()),
                         CsvUtils.escapeCsv(client.getName()),
                         CsvUtils.escapeCsv(client.getSurname()),
-                        client.getRoomNumber()));
+                        client.getRoom().getNumberRoom()));
             }
         } catch (IOException e) {
             throw new DataExportException("Error exporting clients: " + e.getMessage());
@@ -43,7 +43,7 @@ public class ClientCsvService implements ICsvService<Client> {
                         CsvUtils.unescapeCsv(parts[0]),
                         CsvUtils.unescapeCsv(parts[1]),
                         CsvUtils.unescapeCsv(parts[2]),
-                        Integer.parseInt(parts[3])));
+                        null));
             }
         } catch (IOException | NumberFormatException e) {
             throw new DataImportException("Error importing clients: " + e.getMessage());

@@ -19,8 +19,8 @@ public class getAllClientsSortedByNoneAction implements Action {
         try {
             System.out.println("\n=== Список клиентов ===");
             manager.getAllClients().forEach(client -> {
-                String roomInfo = client.getRoomNumber() > 0 ?
-                        "Номер " + client.getRoomNumber() : "Не заселен";
+                String roomInfo = client.getRoom().getNumberRoom() > 0 ?
+                        "Номер " + client.getRoom().getNumberRoom() : "Не заселен";
                 System.out.printf("%s %s | %s | ID: %s%n",
                         client.getName(),
                         client.getSurname(),

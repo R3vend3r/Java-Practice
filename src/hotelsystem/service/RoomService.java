@@ -4,6 +4,7 @@ import hotelsystem.Exception.DatabaseException;
 import hotelsystem.dependencies.annotation.Component;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.enums.RoomCondition;
+import hotelsystem.enums.RoomType;
 import hotelsystem.enums.SortType;
 import hotelsystem.interfaceClass.IClearable;
 import hotelsystem.model.Client;
@@ -31,16 +32,16 @@ public class RoomService implements IClearable {
     }
 
     public Optional<Room> findRoom(int roomNumber) {
-        Optional<Room> room = roomRepository.findRoom(roomNumber);
-        if (room.isEmpty()) {
-            try {
-                room = Optional.ofNullable(roomDAO.findById(roomNumber));
-                room.ifPresent(roomRepository::addRoom);
-            } catch (DatabaseException e) {
-                throw new RuntimeException("Failed to find room", e);
+        try {
+            Room room = roomDAO.findById(roomNumber);
+            if (room != null) {
+                roomRepository.addRoom(room);
+                return Optional.of(room);
             }
+            return roomRepository.findRoom(roomNumber);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find room", e);
         }
-        return room;
     }
 
     public void updateRoom(Room room) {
@@ -59,6 +60,27 @@ public class RoomService implements IClearable {
             return rooms;
         } catch (DatabaseException e) {
             throw new RuntimeException("Failed to get all rooms", e);
+        }
+    }
+
+
+    public List<Room> getAvailableRooms() {
+        try {
+            List<Room> rooms = roomDAO.findAvailableRooms();
+            rooms.forEach(roomRepository::addRoom);
+            return rooms;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get available rooms", e);
+        }
+    }
+
+    public List<Room> getAvailableRoomsByDate(Date date) {
+        try {
+            List<Room> rooms = roomDAO.findAvailableByDate(date);
+            rooms.forEach(roomRepository::addRoom);
+            return rooms;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get available rooms by date", e);
         }
     }
 
@@ -86,8 +108,9 @@ public class RoomService implements IClearable {
                 .orElse(false);
     }
 
-    public void markRoomOccupied(Room room) {
+    public void markRoomOccupied(Room room, Client client) {
         room.setAvailable(false);
+        room.setClient(client);
         updateRoom(room);
     }
 
@@ -95,35 +118,29 @@ public class RoomService implements IClearable {
         findRoom(roomNumber).ifPresent(room -> {
             room.setAvailable(true);
             room.setRoomCondition(RoomCondition.CLEANING_REQUIRED);
-            room.setClientId(null);
+            room.setClient(null);
             room.setAvailableDate(null);
             updateRoom(room);
         });
     }
 
-    public void assignClientToRoom(int roomNumber, String clientId, Date availableDate) {
+    public void assignClientToRoom(int roomNumber, Client client, Date availableDate) {
         findRoom(roomNumber).ifPresent(room -> {
-            room.setClientId(clientId);
+            room.setClient(client);
             room.setAvailableDate(availableDate);
             room.setAvailable(false);
             updateRoom(room);
         });
     }
 
-    public void addClientToRoomHistory(int roomNumber, Client client) {
-        roomRepository.addClientToHistory(roomNumber, client);
-    }
+//    public void addClientToRoomHistory(int roomNumber, Client client) {
+//        roomRepository.addClientToHistory(roomNumber, client);
+//    }
+//
+//    public List<Client> getRoomHistory(int roomNumber) {
+//        return roomRepository.getRoomHistory(roomNumber);
+//    }
 
-    public List<Client> getRoomHistory(int roomNumber) {
-        return roomRepository.getRoomHistory(roomNumber);
-    }
-
-    public List<Room> getAvailableRoomsByDate(Date date) {
-        return getAllRooms().stream()
-                .filter(room -> room.isAvailable() ||
-                        (room.getAvailableDate() != null && !room.getAvailableDate().after(date)))
-                .collect(Collectors.toList());
-    }
 
     public List<Room> getSortedRooms(SortType sortType) {
         return sortRooms(getAllRooms(), sortType);

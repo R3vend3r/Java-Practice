@@ -39,14 +39,12 @@ public class AmenityService implements IClearable {
 
     public boolean amenityExists(String amenityName) {
         try {
-            Optional<Amenity> amenity = amenityRepository.findAmenityByName(amenityName);
-            if (amenity.isEmpty()) {
-                amenity = amenityDAO.findAll().stream()
-                        .filter(a -> a.getName().equalsIgnoreCase(amenityName))
-                        .findFirst();
-                amenity.ifPresent(amenityRepository::addAmenity);
+            Optional<Amenity> amenity = amenityDAO.findByName(amenityName);
+            if (amenity.isPresent()) {
+                amenityRepository.addAmenity(amenity.get());
+                return true;
             }
-            return amenity.isPresent();
+            return amenityRepository.findAmenityByName(amenityName).isPresent();
         } catch (Exception e) {
             throw new RuntimeException("Failed to check amenity existence", e);
         }
@@ -55,7 +53,7 @@ public class AmenityService implements IClearable {
     public void updateAmenityPrice(String amenityName, double newPrice) {
         Objects.requireNonNull(amenityName, "Amenity name cannot be null");
         try {
-            Amenity amenity = amenityRepository.findAmenityByName(amenityName)
+            Amenity amenity = amenityDAO.findByName(amenityName)
                     .orElseThrow(() -> new IllegalArgumentException("Amenity not found"));
             amenity.setPrice(newPrice);
             amenityDAO.update(amenity);
@@ -96,36 +94,38 @@ public class AmenityService implements IClearable {
     public Optional<Amenity> findAmenityByName(String name) {
         Objects.requireNonNull(name, "Amenity name cannot be null");
         try {
-            Optional<Amenity> amenity = amenityRepository.findAmenityByName(name);
-            if (amenity.isEmpty()) {
-                amenity = amenityDAO.findAll().stream()
-                        .filter(a -> a.getName().equalsIgnoreCase(name))
-                        .findFirst();
-                amenity.ifPresent(amenityRepository::addAmenity);
+            Optional<Amenity> amenity = amenityDAO.findByName(name);
+            if (amenity.isPresent()) {
+                amenityRepository.addAmenity(amenity.get());
+                return amenity;
             }
-            return amenity;
+            return amenityRepository.findAmenityByName(name);
         } catch (Exception e) {
             throw new RuntimeException("Failed to find amenity by name", e);
+        }
+    }
+
+    public List<Amenity> findAmenitiesByPriceRange(double minPrice, double maxPrice) {
+        try {
+            List<Amenity> amenities = amenityDAO.findByPriceRange(minPrice, maxPrice);
+            amenities.forEach(amenityRepository::addAmenity);
+            return amenities;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find amenities by price range", e);
         }
     }
 
     public void deleteAmenity(String amenityName) {
         Objects.requireNonNull(amenityName, "Amenity name cannot be null");
         try {
-            amenityRepository.findAmenityByName(amenityName)
-                    .ifPresent(amenity -> {
-                        try {
-                            amenityDAO.delete(amenity.getId());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-            amenityRepository.deleteAmenity(amenityName);
+            amenityDAO.findByName(amenityName).ifPresent(amenity -> {
+                amenityDAO.delete(amenity.getId());
+                amenityRepository.deleteAmenity(amenityName);
+            });
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete amenity", e);
         }
     }
-
     @Override
     public void clear() {
         try {

@@ -26,7 +26,7 @@ public class AmenityOrderCsvService implements ICsvService<AmenityOrder> {
                         client.getId(),
                         CsvUtils.escapeCsv(client.getName()),
                         CsvUtils.escapeCsv(client.getSurname()),
-                        client.getRoomNumber(),
+                        client.getRoom().getNumberRoom(),
                         amenity.getId(),
                         CsvUtils.escapeCsv(amenity.getName()),
                         amenity.getPrice(),
@@ -59,7 +59,7 @@ public class AmenityOrderCsvService implements ICsvService<AmenityOrder> {
                         parts[1],
                         CsvUtils.unescapeCsv(parts[2]),
                         CsvUtils.unescapeCsv(parts[3]),
-                        Integer.parseInt(parts[4]));
+                null);
 
                 Amenity amenity = new Amenity(
                         parts[5],

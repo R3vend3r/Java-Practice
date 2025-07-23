@@ -27,7 +27,7 @@ public class RoomCsvService implements ICsvService<Room> {
                         room.getRoomCondition().name(),
                         room.getStars(),
                         room.isAvailable(),
-                        room.getClientId() != null ? CsvUtils.escapeCsv(room.getClientId()) : "",
+                        room.getClient().getId() != null ? CsvUtils.escapeCsv(room.getClient().getId()) : "",
                         room.getAvailableDate() != null ? room.getAvailableDate().getTime() : ""));
             }
         } catch (IOException e) {
@@ -62,7 +62,7 @@ public class RoomCsvService implements ICsvService<Room> {
                 }
 
                 if (parts.length > 7 && !parts[7].isEmpty()) {
-                    room.setClientId(CsvUtils.unescapeCsv(parts[7]));
+                    room.getClient().setId(CsvUtils.unescapeCsv(parts[7]));
                 }
 
                 if (parts.length > 8 && !parts[8].isEmpty()) {

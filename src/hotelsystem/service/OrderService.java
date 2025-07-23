@@ -37,10 +37,49 @@ public class OrderService implements IClearable {
 
             roomBookingDAO.create(booking);
             orderRepository.addRoomBooking(booking);
-        } catch (DatabaseException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to create booking", e);
         }
     }
+
+    public RoomBooking getActiveBookingByRoom(int roomNumber) {
+        try {
+            return roomBookingDAO.findActiveBookings().stream()
+                    .filter(b -> b.getRoom().getNumberRoom() == roomNumber)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("No active booking for room " + roomNumber));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find active booking", e);
+        }
+    }
+
+    public List<RoomBooking> getActiveBookingsSorted(SortType sortType) {
+        try {
+            List<RoomBooking> bookings = roomBookingDAO.findActiveBookings();
+            return sortBookings(bookings, sortType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get active bookings", e);
+        }
+    }
+
+    public List<RoomBooking> getCompletedBookings() {
+        try {
+            return roomBookingDAO.findCompletedBookings();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get completed bookings", e);
+        }
+    }
+
+    public List<RoomBooking> getLastThreeBookingsForRoom(int roomNumber) {
+        try {
+            return roomBookingDAO.findByRoomNumber(roomNumber).stream()
+                    .limit(3)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get last bookings", e);
+        }
+    }
+
 
     public void addAmenityToBooking(int roomNumber, Amenity amenity, Date serviceDate) {
         try {
@@ -48,141 +87,90 @@ public class OrderService implements IClearable {
 
             AmenityOrder order = new AmenityOrder(
                     generateId(),
-                    booking.getClientId(),
+                    booking.getClient(),
                     amenity.getPrice(),
-                    amenity.getId(),
+                    amenity,
                     serviceDate
             );
 
             amenityOrderDAO.create(order);
             orderRepository.addAmenityOrder(order);
-            booking.addService(order);
-            roomBookingDAO.update(booking);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to add amenity", e);
-        }
-    }
-
-//    public void completeRoomBooking(int roomNumber, Date checkOutDate) {
-//        try {
-//            RoomBooking booking = getActiveBookingByRoom(roomNumber);
-//            booking.setCheckOutDate(checkOutDate);
-//            roomBookingDAO.update(booking);
-//            orderRepository.completeRoomBooking(booking);
-//        } catch (DatabaseException e) {
-//            throw new RuntimeException("Failed to complete booking", e);
-//        }
-//    }
-
-    public RoomBooking getActiveBookingByRoom(int roomNumber) {
-        try {
-            Optional<RoomBooking> booking = orderRepository.findActiveBookingByRoom(roomNumber);
-            if (booking.isEmpty()) {
-                booking = roomBookingDAO.findAll().stream()
-                        .filter(b -> b.getRoom().getNumberRoom() == roomNumber &&
-                                b.getCheckOutDate().after(new Date()))
-                        .findFirst();
-                booking.ifPresent(orderRepository::addRoomBooking);
-            }
-            return booking.orElseThrow(() ->
-                    new IllegalArgumentException("No active booking for room " + roomNumber));
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to find booking", e);
-        }
-    }
-
-    public List<RoomBooking> getCompletedBookings() {
-        try {
-            List<RoomBooking> bookings = roomBookingDAO.findAll().stream()
-                    .filter(b -> b.getCheckOutDate().after(new Date()))
-                    .toList();
-            bookings.forEach(orderRepository::addRoomBooking);
-            return orderRepository.getCompletedBookings();
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get active bookings", e);
-        }
-    }
-
-    public List<AmenityOrder> getAllAmenityOrders() {
-        try {
-            List<AmenityOrder> orders = amenityOrderDAO.findAll();
-            orders.forEach(orderRepository::addAmenityOrder);
-            return orderRepository.getAmenityOrders();
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get amenity orders", e);
-        }
-    }
-    public List<AmenityOrder> getAmenitiesForBooking(String bookingId) {
-        try {
-            amenityOrderDAO.findAll().forEach(orderRepository::addAmenityOrder);
-            return orderRepository.getAmenityOrdersForBooking(bookingId);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get amenity orders", e);
-        }
-    }
-
-    public double calculateAmenityCost(int roomNumber) {
-        try {
-            return orderRepository.calculateAmenityCost(roomNumber);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to calculate amenity cost", e);
-        }
-    }
-
-    public List<RoomBooking> getActiveBookingsSorted(SortType sortType) {
-        try {
-            roomBookingDAO.findAll().stream()
-                    .filter(b -> b.getCheckOutDate().after(new Date()))
-                    .forEach(orderRepository::addRoomBooking);
-            return orderRepository.getSortedBookings(sortType);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get sorted bookings", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add amenity to booking", e);
         }
     }
 
     public List<AmenityOrder> getAmenityOrdersSorted(SortType sortType) {
         try {
-            amenityOrderDAO.findAll().forEach(orderRepository::addAmenityOrder);
-            return orderRepository.getSortedAmenityOrders(sortType);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get sorted amenity orders", e);
+            List<AmenityOrder> orders = amenityOrderDAO.findAll();
+            return sortAmenityOrders(orders, sortType);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get amenity orders", e);
         }
     }
 
-    public List<RoomBooking> getLastThreeBookingsForRoom(int roomNumber) {
+    public List<AmenityOrder> getAmenitiesForClient(String clientId) {
         try {
-            return roomBookingDAO.findAll().stream()
-                    .filter(b -> b.getRoom().getNumberRoom() == roomNumber)
-                    .sorted(Comparator.comparing(RoomBooking::getCheckOutDate).reversed())
-                    .limit(3)
-                    .collect(Collectors.toList());
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to get last bookings", e);
+            return amenityOrderDAO.findByClientId(clientId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get amenities for client", e);
+        }
+    }
+
+    public List<AmenityOrder> getAllAmenityOrders() {
+        try {
+            return amenityOrderDAO.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get all amenity orders", e);
+        }
+    }
+
+
+    public double calculateAmenityCost(int roomNumber) {
+        try {
+            RoomBooking booking = getActiveBookingByRoom(roomNumber);
+            return amenityOrderDAO.findByClientId(booking.getClient().getId()).stream()
+                    .mapToDouble(AmenityOrder::getTotalPrice)
+                    .sum();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate amenity cost", e);
+        }
+    }
+
+    public double calculatingTotalIncome() {
+        try {
+            double bookingsIncome = roomBookingDAO.findCompletedBookings().stream()
+                    .mapToDouble(RoomBooking::getTotalPrice)
+                    .sum();
+
+            double amenitiesIncome = amenityOrderDAO.findAll().stream()
+                    .mapToDouble(AmenityOrder::getTotalPrice)
+                    .sum();
+
+            return bookingsIncome + amenitiesIncome;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to calculate total income", e);
         }
     }
 
     @Override
     public void clear() {
         try {
-            roomBookingDAO.findAll().forEach(b -> {
-                try {
-                    roomBookingDAO.delete(b.getId());
-                } catch (DatabaseException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            amenityOrderDAO.findAll().forEach(o -> {
-                try {
-                    amenityOrderDAO.delete(o.getId());
-                } catch (DatabaseException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            List<RoomBooking> roomBookings = roomBookingDAO.findAll();
+            for (RoomBooking booking : roomBookings) {
+                roomBookingDAO.delete(booking.getId());
+            }
+
+            List<AmenityOrder> amenityOrders = amenityOrderDAO.findAll();
+            for (AmenityOrder order : amenityOrders) {
+                amenityOrderDAO.delete(order.getId());
+            }
             orderRepository.clearAll();
-        } catch (DatabaseException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to clear orders", e);
         }
     }
+
 
     private String generateId() {
         return UUID.randomUUID().toString();
@@ -193,13 +181,22 @@ public class OrderService implements IClearable {
         return pricePerDay * Math.max(1, days);
     }
 
-    public double calculatingTotalIncome() {
-        try {
-            roomBookingDAO.findAll().forEach(orderRepository::addRoomBooking);
-            amenityOrderDAO.findAll().forEach(orderRepository::addAmenityOrder);
-            return orderRepository.calculatingTotalIncome();
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to calculate revenue", e);
-        }
+    private List<RoomBooking> sortBookings(List<RoomBooking> bookings, SortType sortType) {
+        Comparator<RoomBooking> comparator = switch (sortType) {
+            case DATE_END -> Comparator.comparing(RoomBooking::getCheckInDate);
+            case PRICE -> Comparator.comparing(RoomBooking::getTotalPrice);
+            default -> (a, b) -> 0;
+        };
+        return bookings.stream().sorted(comparator).collect(Collectors.toList());
+    }
+
+    private List<AmenityOrder> sortAmenityOrders(List<AmenityOrder> orders, SortType sortType) {
+        Comparator<AmenityOrder> comparator = switch (sortType) {
+            case DATE_END -> Comparator.comparing(AmenityOrder::getServiceDate);
+            case PRICE -> Comparator.comparing(AmenityOrder::getTotalPrice);
+            case ALPHABET -> Comparator.comparing(a -> a.getAmenity().getName());
+            default -> (a, b) -> 0;
+        };
+        return orders.stream().sorted(comparator).collect(Collectors.toList());
     }
 }

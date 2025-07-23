@@ -1,59 +1,45 @@
 package hotelsystem.repo.dao;
 
-import hotelsystem.Exception.DatabaseException;
+import hotelsystem.Utils.HibernateUtils;
 import hotelsystem.model.Amenity;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AmenityDAO extends AbstractDAO<Amenity, String> {
+import java.util.List;
+import java.util.Optional;
 
-    @Override
-    protected String getCreateQuery() {
-        return "INSERT INTO amenities (id, name, price) VALUES (?, ?, ?)";
+public class AmenityDAO extends HibernateBaseDAO<Amenity, String> {
+    private static final Logger logger = LoggerFactory.getLogger(AmenityDAO.class);
+
+    public AmenityDAO() {
+        super(Amenity.class);
     }
 
-    @Override
-    protected String getSelectByIdQuery() {
-        return "SELECT * FROM amenities WHERE id = ?";
+    public Optional<Amenity> findByName(String name) {
+        try (Session session = HibernateUtils.getSession()) {
+            Query<Amenity> query = session.createQuery(
+                    "FROM Amenity a WHERE a.name = :name", Amenity.class);
+            query.setParameter("name", name);
+            return query.uniqueResultOptional();
+        } catch (Exception e) {
+            logger.error("Error finding amenity by name", e);
+            throw new RuntimeException("Failed to find amenity by name", e);
+        }
     }
 
-    @Override
-    protected String getUpdateQuery() {
-        return "UPDATE amenities SET name = ?, price = ? WHERE id = ?";
-    }
-
-    @Override
-    protected String getDeleteQuery() {
-        return "DELETE FROM amenities WHERE id = ?";
-    }
-
-    @Override
-    protected String getSelectAllQuery() {
-        return "SELECT * FROM amenities";
-    }
-
-    @Override
-    protected void setCreateParameters(PreparedStatement ps, Amenity amenity) throws SQLException {
-        ps.setString(1, amenity.getId());
-        ps.setString(2, amenity.getName());
-        ps.setDouble(3, amenity.getPrice());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement ps, Amenity amenity) throws SQLException {
-        ps.setString(1, amenity.getName());
-        ps.setDouble(2, amenity.getPrice());
-        ps.setString(3, amenity.getId());
-    }
-
-    @Override
-    protected Amenity mapResultSetToEntity(ResultSet rs) throws SQLException {
-        Amenity amenity = new Amenity();
-        amenity.setId(rs.getString("id"));
-        amenity.setName(rs.getString("name"));
-        amenity.setPrice(rs.getDouble("price"));
-        return amenity;
+    public List<Amenity> findByPriceRange(double minPrice, double maxPrice) {
+        try (Session session = HibernateUtils.getSession()) {
+            Query<Amenity> query = session.createQuery(
+                    "FROM Amenity a WHERE a.price BETWEEN :minPrice AND :maxPrice", Amenity.class);
+            query.setParameter("minPrice", minPrice);
+            query.setParameter("maxPrice", maxPrice);
+            return query.getResultList();
+        } catch (Exception e) {
+            logger.error("Error finding amenities by price range", e);
+            throw new RuntimeException("Failed to find amenities by price range", e);
+        }
     }
 }

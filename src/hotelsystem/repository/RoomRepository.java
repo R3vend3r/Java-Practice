@@ -9,7 +9,7 @@
     @Component
     public class RoomRepository implements IRoomRepository {
         private final Map<Integer, Room> rooms = new HashMap<>();
-        private final Map<Integer, Queue<Client>> roomHistory = new HashMap<>();
+//        private final Map<Integer, Queue<Client>> roomHistory = new HashMap<>();
 
         @Override
         public void addRoom(Room room) {
@@ -25,21 +25,21 @@
         public List<Room> getAllRooms() {
             return new ArrayList<>(rooms.values());
         }
-
-        @Override
-        public void addClientToHistory(int roomNumber, Client client) {
-            roomHistory.computeIfAbsent(roomNumber, k -> new LinkedList<>()).add(client);
-        }
-
-        @Override
-        public List<Client> getRoomHistory(int roomNumber) {
-            Queue<Client> history = roomHistory.get(roomNumber);
-            return history != null ? new ArrayList<>(history) : Collections.emptyList();
-        }
+//
+//        @Override
+//        public void addClientToHistory(int roomNumber, Client client) {
+//            roomHistory.computeIfAbsent(roomNumber, k -> new LinkedList<>()).add(client);
+//        }
+//
+//        @Override
+//        public List<Client> getRoomHistory(int roomNumber) {
+//            Queue<Client> history = roomHistory.get(roomNumber);
+//            return history != null ? new ArrayList<>(history) : Collections.emptyList();
+//        }
 
         @Override
         public void clear() {
             rooms.clear();
-            roomHistory.clear();
+//            roomHistory.clear();
         }
     }

@@ -6,47 +6,77 @@ import hotelsystem.dependencies.annotation.ConfigProperty;
 import hotelsystem.dependencies.annotation.Inject;
 import hotelsystem.enums.RoomCondition;
 import hotelsystem.enums.RoomType;
+import hotelsystem.model.converters.RoomConditionConverter;
+import hotelsystem.model.converters.RoomTypeConverter;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 
+@Entity
+@Table(name = "rooms")
 public class Room implements Serializable {
     @Setter
     @Getter
-    private int numberRoom;
+    @Id
+    @Column(name = "number", nullable = false)
+    private Integer numberRoom;
+
     @Setter
     @Getter
     @JsonProperty("available")
+    @Column(name = "is_available", nullable = false)
     private boolean isAvailable;
+
     @Getter
+    @Convert(converter = RoomConditionConverter.class)
+    @Column(name = "condition", nullable = false)
     private RoomCondition roomCondition;
+
     @Setter
     @Getter
+    @Convert(converter = RoomTypeConverter.class)
+    @Column(nullable = false)
     private RoomType type;
+
     @Getter
+    @Column(name = "price", nullable = false)
     private double priceForDay;
+
     @Setter
     @Getter
+    @Column(name = "available_date", nullable = true)
     private Date availableDate;
+
     @Getter
+    @Column(name = "capacity", nullable = false)
     private int capacity;
+
     @Getter
+    @Column(name = "stars", nullable = false)
     private int stars;
+
     @Setter
     @Getter
-    private String clientId;
-    @ConfigProperty(propertyName = "hotel.room.history.max_entries")
-    private int maxHistoryEntries;
-    private final Queue<Client> clientHistory = new LinkedList<>();
-    @Inject
-    private HotelConfig hotelConfig;
+    @OneToOne(mappedBy = "room")
+    private Client client;
+
+
+//    @ConfigProperty(propertyName = "hotel.room.history.max_entries")
+//    private int maxHistoryEntries;
+
+//    @Getter
+//    @ElementCollection
+//    @CollectionTable(name = "room_client_history", joinColumns = @JoinColumn(name = "number"))
+//    @Column(name = "client_id") // Укажи имя столбца для хранения client.id
+//    private List<String> clientHistory = new ArrayList<>(); // Храним только id клиентов
+
+
     public Room() {
+//        this.clientHistory = new LinkedList<>();
     }
 
     public Room(int number, RoomType type, double priceForDay, int capacity,
@@ -65,22 +95,23 @@ public class Room implements Serializable {
                 RoomCondition.READY, 3);
     }
 
-    public void addClientToHistory(Client client) {
-        Objects.requireNonNull(client, "Client cannot be null");
-        clientHistory.add(client);
-        trimHistory();
-    }
+//    public void addClientToHistory(Client client) {
+//        Objects.requireNonNull(client, "Client cannot be null");
+//        clientHistory.add(client.getId());
+//        trimHistory();
+//    }
+//
+//    private void trimHistory() {
+//        while (clientHistory.size() > hotelConfig.getMaxHistoryEntries()) {
+//            clientHistory.remove(0);
+//        }
+//    }
 
-    private void trimHistory() {
-        while (clientHistory.size() > maxHistoryEntries) {
-            clientHistory.poll();
-        }
-    }
 
     public void clearRoom() {
         isAvailable = true;
         roomCondition = RoomCondition.CLEANING_REQUIRED;
-        clientId = null;
+        client = null;
         availableDate = null;
     }
 
@@ -97,9 +128,9 @@ public class Room implements Serializable {
     }
 
     public void setRoomCondition(RoomCondition status) {
-        if (hotelConfig != null && !hotelConfig.isRoomStatusChangeEnabled()) {
-            throw new IllegalStateException("Изменение статуса комнаты отключено в настройках");
-        }
+//        if (hotelConfig != null && !hotelConfig.isRoomStatusChangeEnabled()) {
+//            throw new IllegalStateException("Изменение статуса комнаты отключено в настройках");
+//        }
         this.roomCondition = Objects.requireNonNull(status);
     }
 
@@ -118,9 +149,6 @@ public class Room implements Serializable {
         this.stars = stars;
     }
 
-    public Queue<Client> getClientHistory() {
-        return new LinkedList<>(clientHistory);
-    }
 
     @Override
     public String toString() {

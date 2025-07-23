@@ -1,62 +1,43 @@
 package hotelsystem.repo.dao;
 
-import hotelsystem.Exception.DatabaseException;
 import hotelsystem.model.Client;
+import hotelsystem.Utils.HibernateUtils;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
-public class ClientDAO extends AbstractDAO<Client, String> {
+public class ClientDAO extends HibernateBaseDAO<Client, String> {
+    private static final Logger logger = LoggerFactory.getLogger(ClientDAO.class);
 
-    @Override
-    protected String getCreateQuery() {
-        return "INSERT INTO clients (id, name, surname, room_number) VALUES (?, ?, ?, ?)";
+    public ClientDAO() {
+        super(Client.class);
     }
 
-    @Override
-    protected String getSelectByIdQuery() {
-        return "SELECT * FROM clients WHERE id = ?";
+    public List<Client> findByRoomNumber(int roomNumber) {
+        try (Session session = HibernateUtils.getSession()) {
+            Query<Client> query = session.createQuery(
+                    "FROM Client c WHERE c.room.numberRoom = :roomNumber", Client.class);
+            query.setParameter("roomNumber", roomNumber);
+            return query.getResultList();
+        } catch (Exception e) {
+            logger.error("Error finding clients by room number", e);
+            throw new RuntimeException("Failed to find clients by room number", e);
+        }
     }
 
-    @Override
-    protected String getUpdateQuery() {
-        return "UPDATE clients SET name = ?, surname = ?, room_number = ? WHERE id = ?";
-    }
-
-    @Override
-    protected String getDeleteQuery() {
-        return "DELETE FROM clients WHERE id = ?";
-    }
-
-    @Override
-    protected String getSelectAllQuery() {
-        return "SELECT * FROM clients";
-    }
-
-    @Override
-    protected void setCreateParameters(PreparedStatement ps, Client client) throws SQLException {
-        ps.setString(1, client.getId());
-        ps.setString(2, client.getName());
-        ps.setString(3, client.getSurname());
-        ps.setInt(4, client.getRoomNumber());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement ps, Client client) throws SQLException {
-        ps.setString(1, client.getName());
-        ps.setString(2, client.getSurname());
-        ps.setInt(3, client.getRoomNumber());
-        ps.setString(4, client.getId());
-    }
-
-    @Override
-    protected Client mapResultSetToEntity(ResultSet rs) throws SQLException {
-        Client client = new Client();
-        client.setId(rs.getString("id"));
-        client.setName(rs.getString("name"));
-        client.setSurname(rs.getString("surname"));
-        client.setRoomNumber(rs.getInt("room_number"));
-        return client;
+    public Optional<Client> findByRoom(int roomNumber) {
+        try (Session session = HibernateUtils.getSession()) {
+            Query<Client> query = session.createQuery(
+                    "FROM Client c WHERE c.room.numberRoom = :roomNumber", Client.class);
+            query.setParameter("roomNumber", roomNumber);
+            return query.uniqueResultOptional();
+        } catch (Exception e) {
+            logger.error("Error finding client by room", e);
+            throw new RuntimeException("Failed to find client by room", e);
+        }
     }
 }

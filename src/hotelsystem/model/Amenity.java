@@ -1,14 +1,25 @@
 package hotelsystem.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-@Getter
+@Entity
+@Table(name = "amenities")
 public class Amenity implements Serializable {
+    @Id
+    @Column(name = "id")
     private String id;
+    @Getter
+    @Column(name = "name", nullable = false)
     private String name;
+    @Getter
+    @Column(name = "price", nullable = false)
     private double price;
 
     public Amenity() {
@@ -22,6 +33,10 @@ public class Amenity implements Serializable {
 
     public Amenity(String name, double price) {
         this(generateId(), name, price);
+    }
+
+    public String getId() {
+        return id;
     }
 
     private static String generateId() {

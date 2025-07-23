@@ -1,30 +1,42 @@
 package hotelsystem.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@Entity
+@Table(name = "clients")
 public class Client implements Serializable {
+    @Id
     private String id;
+    @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "surname", nullable = false)
     private String surname;
-    private int roomNumber;
+    @Getter
+    @Setter
+    @OneToOne
+    @JoinColumn(name = "room_number")
+    private Room room;
 
     public Client() {
     }
 
-    public Client(String id, String name, String surname, int roomNumber) {
+    public Client(String id, String name, String surname, Room room) {
         setId(id);
         setName(name);
         setSurname(surname);
-        setRoomNumber(roomNumber);
+        setRoom(room);
     }
 
     public Client(String name, String surname) {
-        this(generateId(), name, surname, -1);
+        this(generateId(), name, surname, null);
     }
 
     private static String generateId() {
@@ -52,16 +64,10 @@ public class Client implements Serializable {
         }
     }
 
-    public void setRoomNumber(int roomNumber) {
-        if (roomNumber < -1) {
-            throw new IllegalArgumentException("Room number cannot be negative");
-        }
-        this.roomNumber = roomNumber;
-    }
 
     @Override
     public String toString() {
-        return String.format("Client[id=%s, name=%s, surname=%s, room=%d]",
-                id, name, surname, roomNumber);
+        return String.format("Client[id=%s, name=%s, surname=%s, room=%s]",
+                id, name, surname, (room != null ? room.getNumberRoom() : "null"));
     }
 }

@@ -39,8 +39,8 @@ public class FindRoomAction implements Action {
                 System.out.printf("Звезды: %d\n", room.getStars());
                 System.out.printf("Доступна: %s\n", room.isAvailable() ? "Да" : "Нет");
 
-                if (room.getClientId() != null) {
-                    System.out.printf("ID клиента: %s\n", room.getClientId());
+                if (room.getClient().getId() != null) {
+                    System.out.printf("ID клиента: %s\n", room.getClient().getId());
                 }
                 if (room.getAvailableDate() != null) {
                     System.out.printf("Дата освобождения: %s\n", room.getAvailableDate());

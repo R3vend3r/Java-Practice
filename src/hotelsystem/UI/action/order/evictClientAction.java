@@ -33,14 +33,9 @@ public class evictClientAction implements Action {
                         System.out.println("Клиент: " + client);
                         System.out.print("Выселить (да/нет)? ");
                         if(scanner.nextLine().equalsIgnoreCase("да")) {
-                            try {
                                 manager.evictClient(roomNumber);
                                 logger.info("Клиент успешно выселен из комнаты {}", roomNumber);
                                 System.out.println("Клиент выселен");
-                            } catch (SQLException e) {
-                                logger.error("Ошибка базы данных при выселении клиента", e);
-                                throw new RuntimeException("Ошибка базы данных", e);
-                            }
                         } else {
                             logger.info("Выселение клиента отменено пользователем");
                         }

@@ -32,7 +32,7 @@ public class RoomBookingCsvService implements ICsvService<RoomBooking> {
                         client.getId(),
                         CsvUtils.escapeCsv(client.getName()),
                         CsvUtils.escapeCsv(client.getSurname()),
-                        client.getRoomNumber(),
+                        client.getRoom().getNumberRoom(),
                         room.getNumberRoom(),
                         room.getType(),
                         room.getPriceForDay(),
@@ -66,7 +66,7 @@ public class RoomBookingCsvService implements ICsvService<RoomBooking> {
                         parts[1],
                         CsvUtils.unescapeCsv(parts[2]),
                         CsvUtils.unescapeCsv(parts[3]),
-                        Integer.parseInt(parts[4])
+                        null
                 );
 
                 Room room = new Room(

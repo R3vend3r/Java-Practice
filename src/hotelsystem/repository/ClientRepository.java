@@ -20,7 +20,7 @@ public class ClientRepository implements IClientRepository {
     @Override
     public Optional<Client> findClientByRoomNumber(int roomNumber) {
         return clients.values().stream()
-                .filter(c -> c.getRoomNumber() == roomNumber)
+                .filter(c -> c.getRoom().getNumberRoom() == roomNumber)
                 .findFirst();
     }
 
@@ -36,14 +36,14 @@ public class ClientRepository implements IClientRepository {
 
     @Override
     public void removeClientByRoomNumber(int roomNumber) {
-        clients.values().removeIf(c -> c.getRoomNumber() == roomNumber);
+        clients.values().removeIf(c -> c.getRoom().getNumberRoom() == roomNumber);
     }
 
     @Override
     public void assignRoomToClient(String clientId, int roomNumber) {
         Client client = clients.get(clientId);
         if (client != null) {
-            client.setRoomNumber(roomNumber);
+            client.getRoom().setNumberRoom(roomNumber);
         }
     }
 

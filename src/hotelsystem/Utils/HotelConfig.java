@@ -1,6 +1,9 @@
 package hotelsystem.Utils;
 
 import hotelsystem.dependencies.annotation.ConfigProperty;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+@Embeddable
 public class HotelConfig {
     private static final Logger logger = LoggerFactory.getLogger(HotelConfig.class);
     private static HotelConfig instance;
@@ -23,8 +27,9 @@ public class HotelConfig {
     private boolean roomStatusChangeEnabled = true;
 
     @Getter
-    @ConfigProperty(propertyName = "hotel.room.history.entries.max")
-    private int maxHistoryEntries = 3;
+    @ConfigProperty(propertyName = "hotel.room.history.max_entries")
+    @Transient
+    private int maxHistoryEntries;
 
     @Getter
     @ConfigProperty(propertyName = "hotel.database.file")

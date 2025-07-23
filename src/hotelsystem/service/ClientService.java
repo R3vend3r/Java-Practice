@@ -32,16 +32,15 @@ public class ClientService implements IClearable {
 
     public Optional<Client> findClientByRoomNumber(int roomNumber) {
         try {
-            Optional<Client> client = clientRepository.findClientByRoomNumber(roomNumber);
-            if (client.isEmpty()) {
-                client = clientDAO.findAll().stream()
-                        .filter(c -> c.getRoomNumber() == roomNumber)
-                        .findFirst();
-                client.ifPresent(clientRepository::addClient);
+            List<Client> clients = clientDAO.findByRoomNumber(roomNumber);
+            if (!clients.isEmpty()) {
+                Client client = clients.get(0);
+                clientRepository.addClient(client);
+                return Optional.of(client);
             }
-            return client;
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to find client by room", e);
+            return clientRepository.findClientByRoomNumber(roomNumber);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find client by room number", e);
         }
     }
 
@@ -57,31 +56,26 @@ public class ClientService implements IClearable {
     public Optional<Client> findClientById(String clientId) {
         Objects.requireNonNull(clientId, "Client ID cannot be null");
         try {
-            Optional<Client> client = clientRepository.findClientById(clientId);
-            if (client.isEmpty()) {
-                client = Optional.ofNullable(clientDAO.findById(clientId));
-                client.ifPresent(clientRepository::addClient);
+            Client client = clientDAO.findById(clientId);
+            if (client != null) {
+                clientRepository.addClient(client);
+                return Optional.of(client);
             }
-            return client;
-        } catch (DatabaseException e) {
+            return clientRepository.findClientById(clientId);
+        } catch (Exception e) {
             throw new RuntimeException("Failed to find client by ID", e);
         }
     }
 
     public void removeClientByRoomNumber(int roomNumber) {
         try {
-            clientDAO.findAll().stream()
-                    .filter(c -> c.getRoomNumber() == roomNumber)
-                    .forEach(c -> {
-                        try {
-                            clientDAO.delete(c.getId());
-                        } catch (DatabaseException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-            clientRepository.removeClientByRoomNumber(roomNumber);
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Failed to remove client by room", e);
+            List<Client> clients = clientDAO.findByRoomNumber(roomNumber);
+            for (Client client : clients) {
+                clientDAO.delete(client.getId());
+                clientRepository.removeClientByRoomNumber(roomNumber);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to remove client by room number", e);
         }
     }
 
@@ -91,7 +85,7 @@ public class ClientService implements IClearable {
             Client client = findClientById(clientId)
                     .orElseThrow(() -> new IllegalArgumentException("Client not found"));
 
-            client.setRoomNumber(roomNumber);
+            client.getRoom().setNumberRoom(roomNumber);
             clientDAO.update(client);
             clientRepository.assignRoomToClient(clientId, roomNumber);
         } catch (DatabaseException e) {
